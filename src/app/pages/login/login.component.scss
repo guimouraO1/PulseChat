@@ -7,16 +7,18 @@
   overflow: hidden;
   object-fit: cover;
   position: relative;
-  .svg {  
+  .svg {
     position: absolute;
-    animation: rotate 200s linear infinite, glitch 1s infinite;;
+    animation: rotate 200s linear infinite, glitch 1s infinite;
   }
   @keyframes rotate {
     from {
       transform: rotate(0deg); /* Começa a rotação a partir de 0 graus */
     }
     to {
-      transform: rotate(360deg); /* Termina a rotação em 360 graus (uma volta completa) */
+      transform: rotate(
+        360deg
+      ); /* Termina a rotação em 360 graus (uma volta completa) */
     }
   }
 }
@@ -49,6 +51,7 @@
     flex-direction: column;
     margin: 40px;
     gap: 10px;
+    overflow: hidden;
     .content-icon {
       margin-bottom: 42px;
       transform: scale(5);
@@ -56,8 +59,26 @@
     mat-form-field {
       width: 80%;
     }
+
+    ::ng-deep .mdc-button--outlined .mdc-button__ripple{
+      border-color: #dee2e628;
+    }
+    ::ng-deep .mdc-notched-outline > * {
+      border-color: #dee2e628 !important;
+    }
+    ::ng-deep .mdc-text-field--focused .mdc-notched-outline > * {
+      border-color: #1e88e5 !important;
+    }
+
+    
+    // ::ng-deep .mdc-notched-outline__trailing {
+    //   border-color: darkorange !important;
+    //   border-top-right-radius: 100px !important;
+    //   border-bottom-right-radius: 100px !important;
+    // }
+
     button {
-      width: 60%;
+      width: 40%;
     }
     mat-label {
       color: #dee2e6;
