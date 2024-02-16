@@ -4,6 +4,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  object-fit: cover;
+  position: relative;
+  .svg {  
+    position: absolute;
+    animation: rotate 200s linear infinite, glitch 1s infinite;;
+  }
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg); /* Começa a rotação a partir de 0 graus */
+    }
+    to {
+      transform: rotate(360deg); /* Termina a rotação em 360 graus (uma volta completa) */
+    }
+  }
 }
 
 .card {
@@ -15,7 +30,7 @@
   padding: 10px;
 
   .login {
-    box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -25,7 +40,7 @@
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.014);
   }
-  .content{
+  .content {
     height: 80%;
     width: 80%;
     display: flex;
@@ -34,31 +49,30 @@
     flex-direction: column;
     margin: 40px;
     gap: 10px;
-    .content-icon{
+    .content-icon {
       margin-bottom: 42px;
       transform: scale(5);
     }
-    mat-form-field{
+    mat-form-field {
       width: 80%;
     }
-    button{
+    button {
       width: 60%;
     }
-    mat-label{
+    mat-label {
       color: #dee2e6;
     }
-    input{
+    input {
       color: #dee2e6;
     }
   }
-  
+
   .icon {
     align-self: flex-end; /* Alinha à direita */
     margin: 20px; /* Ajusta a posição para a direita */
   }
-  
+
   button {
     color: #dee2e6;
   }
-  
 }

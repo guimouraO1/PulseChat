@@ -16,6 +16,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/login/login.component').then((p) => p.LoginComponent),
       },
+      {
+        path: 'chat',
+        title: 'PulseChat | Chat',
+        loadComponent: () =>
+          import('./pages/chat/chat.component').then((p) => p.ChatComponent),
+      },
     ],
   },
 ];
