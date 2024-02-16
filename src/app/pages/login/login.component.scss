@@ -9,16 +9,15 @@
   position: relative;
   .svg {
     position: absolute;
-    animation: rotate 200s linear infinite, glitch 1s infinite;
+    animation: rotate 150s linear infinite, glitch 1s infinite;
   }
+
   @keyframes rotate {
     from {
-      transform: rotate(0deg); /* Começa a rotação a partir de 0 graus */
+      transform: rotate(0deg);
     }
     to {
-      transform: rotate(
-        360deg
-      ); /* Termina a rotação em 360 graus (uma volta completa) */
+      transform: rotate(360deg);
     }
   }
 }
@@ -53,47 +52,45 @@
     gap: 10px;
     overflow: hidden;
     .content-icon {
-      margin-bottom: 42px;
+      margin-bottom: 60px;
       transform: scale(5);
     }
     mat-form-field {
       width: 80%;
     }
-
-    ::ng-deep .mdc-button--outlined .mdc-button__ripple{
+    /* Substitue a cor da borda do input */
+    ::ng-deep .mdc-button--outlined .mdc-button__ripple {
       border-color: #dee2e628;
     }
+    /* Substitue a cor da borda do input */
     ::ng-deep .mdc-notched-outline > * {
       border-color: #dee2e628 !important;
     }
+    /* Substitue a cor da borda do input quando selecionado */
     ::ng-deep .mdc-text-field--focused .mdc-notched-outline > * {
       border-color: #1e88e5 !important;
     }
-
-    
-    // ::ng-deep .mdc-notched-outline__trailing {
-    //   border-color: darkorange !important;
-    //   border-top-right-radius: 100px !important;
-    //   border-bottom-right-radius: 100px !important;
-    // }
-
+    /*  */
     button {
       width: 40%;
+      color: #dee2e6;
     }
+    /* Substitue a cor do texto mat-label*/
     mat-label {
       color: #dee2e6;
     }
+    /* Substitue a cor do texto do input */
     input {
       color: #dee2e6;
     }
   }
-
   .icon {
     align-self: flex-end; /* Alinha à direita */
-    margin: 20px; /* Ajusta a posição para a direita */
+    margin: 20px;
   }
-
-  button {
-    color: #dee2e6;
-  }
+}
+/* Substitue a cor do autocomplete do background do input pela cor desejada.  (none)*/
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 0s 600000s, color 0s 600000s !important;
 }
