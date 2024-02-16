@@ -1,0 +1,53 @@
+@use "../../../assets/colors/colors.scss" as colors;
+
+.main-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.side-nav {
+  width: 25vw;
+  height: 100%;
+  background-color: colors.$background2;
+  display: flex;
+  justify-content: center;
+}
+.chat {
+  width: 75vw;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  .chat-input {
+    width: 90%;
+  }
+  /* Substitue a cor do texto do input */
+  input {
+    color: colors.$text-primary;
+  }
+  mat-icon {
+    color: colors.$primary;
+    cursor: pointer;
+  }
+}
+/* Substitue a cor da borda do input */
+::ng-deep .mdc-button--outlined .mdc-button__ripple {
+  border-color: #dee2e628;
+}
+/* Substitue a cor da borda do input */
+::ng-deep .mdc-notched-outline > * {
+  border-color: #dee2e628 !important;
+}
+/* Substitue a cor da borda do input quando selecionado */
+::ng-deep .mdc-text-field--focused .mdc-notched-outline > * {
+  border-color: colors.$primary !important;
+}
+mat-label {
+  color: colors.$text-primary;
+}
+::ng-deep input::placeholder {
+  color: #dee2e628 !important;
+}
