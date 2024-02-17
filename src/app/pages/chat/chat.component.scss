@@ -20,6 +20,7 @@
     align-items: center;
     flex-direction: column;
     .exit-button {
+      overflow: visible;
       margin: 20px;
       align-self: flex-end;
       cursor: pointer;
@@ -30,7 +31,43 @@
 
     .header{
       margin: 20px;
+      
     }
+    .search{
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-evenly;
+      width: 90%;
+      mat-form-field{
+        width: 90%;
+      }
+      input {
+        color: colors.$text-primary;
+      }
+    }
+    .friends{
+      margin-top: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 90%;
+      height: 100%;
+      cursor: pointer;
+
+      .friends-card{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 4px;
+        background-color: rgba(71, 71, 71, 0.199);
+      }
+    }
+
+
   }
 }
 .chat {

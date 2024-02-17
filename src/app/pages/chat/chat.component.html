@@ -2,12 +2,27 @@
   <div class="side-nav">
     <div class="side-nav-content">
       <mat-icon (click)="exitApp()" class="exit-button">exit_to_app</mat-icon>
-      <div class="header">
-        welcome back
-        {{ user?.email }}
-      </div>
-      <div class="friends">
 
+      <div class="header">
+        <span>welcome back {{ user?.email }}</span>
+      </div>
+      <div class="search">
+        <mat-form-field class="chat-input" appearance="outline">
+          <input matInput placeholder="Search" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <!-- <mat-icon >person_add</mat-icon> -->
+      </div>
+
+      <div class="friends">
+        @for (user of users; track $index) {
+        <div class="friends-card">
+          <p>{{ user.email }}</p>
+        </div>
+        } @empty {
+          <p>No friends</p>
+        }
+        <!-- <mat-icon class="add_new_chat">person_add</mat-icon> -->
       </div>
     </div>
   </div>

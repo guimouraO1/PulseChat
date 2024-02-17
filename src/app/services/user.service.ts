@@ -18,4 +18,11 @@ export class UserService {
 
     return this.http.get<User[]>(`${this.urlApi}/user/auth`, { headers });
   }
+
+  getUsers(): Observable<User[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('authorization', `${token}`);
+
+    return this.http.get<User[]>(`${this.urlApi}/users`, { headers });
+  }
 }
