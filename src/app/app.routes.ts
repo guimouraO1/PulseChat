@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
+import { alwaysAllowAuthGuard, authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    // canActivate: [],
+    canActivate: [alwaysAllowAuthGuard],
     children: [
       {
         path: '',
@@ -16,6 +17,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/login/login.component').then((p) => p.LoginComponent),
       },
+    ],
+  },
+  {
+    path: '',
+    canActivate: [authGuard],
+    children: [
       {
         path: 'chat',
         title: 'PulseChat | Chat',

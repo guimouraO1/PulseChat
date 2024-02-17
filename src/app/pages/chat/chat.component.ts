@@ -15,6 +15,8 @@ export class ChatComponent {
   _router = inject(Router);
 
   exitApp(){
+    // localStorage.clear();
+    localStorage.removeItem("token");
     this._router.navigate(['login']);
   }
 }

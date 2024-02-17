@@ -15,47 +15,47 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private snackBar: MatSnackBar,
+    private snackBar: MatSnackBar
   ) {}
 
   login(loginForm: {}) {
     this.http
-      .post(`${this.urlApi}/login`, { loginForm })
+      .post(`${this.urlApi}/login`, loginForm)
       .pipe(take(1))
       .subscribe({
         next: (res: any) => {
           this._isAuthenticated = true;
           localStorage.setItem('token', res.authToken);
-          this.router.navigate(['/chat']);
+          this.router.navigate(['chat']);
           this.openSnackBar('Login successful!', res.user.email);
         },
         error: (e: any) => {
-          this.openSnackBar(e.error.msg, '❗');
+          this.openSnackBar(e.error.msg, 'OK');
         },
       });
   }
 
-  register(email: string, password: string, confirmPassword: string) {
-    this.http
-      .post(`${this.urlApi}/user`, {
-        email,
-        password,
-        confirmPassword,
-      })
-      .pipe(take(1))
-      .subscribe({
-        next: (res: any) => {
-          if (res.register) {
-            this.router.navigate(['']);
-            this.openSnackBar('Register successful!', '✅');
-          }
-        },
-        error: (e: any) => {
-          this.openSnackBar(e.error.msg, '❗');
-        },
-      });
-  }
-  
+  // register(email: string, password: string, confirmPassword: string) {
+  //   this.http
+  //     .post(`${this.urlApi}/user`, {
+  //       email,
+  //       password,
+  //       confirmPassword,
+  //     })
+  //     .pipe(take(1))
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         if (res.register) {
+  //           this.router.navigate(['']);
+  //           this.openSnackBar('Register successful!', '✅');
+  //         }
+  //       },
+  //       error: (e: any) => {
+  //         this.openSnackBar(e.error.msg, '❗');
+  //       },
+  //     });
+  // }
+
   async asycUserAuthentication() {
     const authToken = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${authToken}`);
@@ -64,9 +64,8 @@ export class AuthService {
       const res: any = await lastValueFrom(
         this.http.get(`${this.urlApi}/user/auth`, { headers }).pipe(take(1))
       );
-
-      this._isAuthenticated = res.loggedIn;
-      return res.loggedIn;
+      this._isAuthenticated = true;
+      return true;
     } catch (e) {
       this._isAuthenticated = false;
       return false;
@@ -82,6 +81,7 @@ export class AuthService {
     this.snackBar.open(message, action, {
       duration: 2000,
       verticalPosition: 'top',
+      panelClass: ['primary'],
     });
   }
 }

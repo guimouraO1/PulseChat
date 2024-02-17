@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
 import {
   FormBuilder,
   FormGroup,
@@ -12,6 +11,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -33,27 +34,42 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private _authService: AuthService,
+    private _router: Router
   ) {}
 
-  openSnackBar() {
+  async ngOnInit() {
+    this.loginForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.maxLength(30)]],
+    });
+
+    let result = await this._authService.asycUserAuthentication();
+
+    if (result) {
+      this._router.navigate(['chat']);
+    } else {
+      this._router.navigate(['login']);
+    }
+  }
+
+  login(): void {
+    this._authService.login(this.loginForm.value);
+  }
+
+  openSnackBar(): void {
     this._snackBar.open('Complete all the fields correctly.', 'I understood!', {
       horizontalPosition: 'center',
       verticalPosition: 'top',
       duration: 8000,
-    });
-  }
-
-  ngOnInit(): void {
-    this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['',[ Validators.required, Validators.maxLength(30)]],
+      panelClass: ['my'],
     });
   }
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      console.log('Form submitted:', this.loginForm.value);
+      this.login();
     } else {
       this.openSnackBar();
     }
