@@ -27,6 +27,10 @@
     .exit-button:hover {
       color: red;
     }
+
+    .header{
+      margin: 20px;
+    }
   }
 }
 .chat {
@@ -37,8 +41,8 @@
   justify-content: flex-end;
   align-items: center;
   gap: 20px;
-  .chat-messages {
-  }
+  // .chat-messages {
+  // }
   .chat-input {
     width: 90%;
   }

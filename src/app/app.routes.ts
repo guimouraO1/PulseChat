@@ -31,4 +31,13 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: '**',
+    title: 'PulseChat | 404',
+    canActivate: [alwaysAllowAuthGuard],
+    loadComponent: () =>
+      import('./pages/not-found/not-found.component').then(
+        (p) => p.NotFoundComponent
+      ),
+  },
 ];

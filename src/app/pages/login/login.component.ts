@@ -45,15 +45,8 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required, Validators.maxLength(30)]],
     });
 
-    let result = await this._authService.asycUserAuthentication();
-
-    if (result) {
-      this._router.navigate(['chat']);
-    } else {
-      this._router.navigate(['login']);
-    }
+    await this.isLogged();
   }
-
   login(): void {
     this._authService.login(this.loginForm.value);
   }
@@ -63,7 +56,6 @@ export class LoginComponent implements OnInit {
       horizontalPosition: 'center',
       verticalPosition: 'top',
       duration: 8000,
-      panelClass: ['my'],
     });
   }
 
@@ -71,7 +63,17 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       this.login();
     } else {
-      this.openSnackBar();
+      // this.openSnackBar();
+    }
+  }
+
+  async isLogged() {
+    let result = await this._authService.asycUserAuthentication();
+
+    if (result) {
+      this._router.navigate(['chat']);
+    } else {
+      this._router.navigate(['login']);
     }
   }
 }

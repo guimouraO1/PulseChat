@@ -30,7 +30,7 @@ export class AuthService {
           this.openSnackBar('Login successful!', res.user.email);
         },
         error: (e: any) => {
-          this.openSnackBar(e.error.msg, 'OK');
+          this.openSnackBar(e.error.msg, '');
         },
       });
   }
@@ -47,11 +47,11 @@ export class AuthService {
   //       next: (res: any) => {
   //         if (res.register) {
   //           this.router.navigate(['']);
-  //           this.openSnackBar('Register successful!', '✅');
+  //           this.openSnackBar('Register successful!', '');
   //         }
   //       },
   //       error: (e: any) => {
-  //         this.openSnackBar(e.error.msg, '❗');
+  //         this.openSnackBar(e.error.msg, '');
   //       },
   //     });
   // }
@@ -81,7 +81,6 @@ export class AuthService {
     this.snackBar.open(message, action, {
       duration: 2000,
       verticalPosition: 'top',
-      panelClass: ['primary'],
     });
   }
 }

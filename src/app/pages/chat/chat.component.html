@@ -2,12 +2,17 @@
   <div class="side-nav">
     <div class="side-nav-content">
       <mat-icon (click)="exitApp()" class="exit-button">exit_to_app</mat-icon>
+      <div class="header">
+        welcome back
+        {{ user?.email }}
+      </div>
+      <div class="friends">
+
+      </div>
     </div>
   </div>
   <div class="chat">
-    <div class="chat-messages">
-
-    </div>
+    <div class="chat-messages"></div>
     <mat-form-field class="chat-input" appearance="outline">
       <input matInput placeholder="Type a message" />
       <mat-icon matSuffix>send</mat-icon>
