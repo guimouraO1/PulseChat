@@ -1,20 +1,44 @@
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+} from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
-import { take } from 'rxjs';
+import { take, takeUntil } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { MessagesComponent } from '../../components/messages/messages.component';
+import { FormsModule } from '@angular/forms';
+import { ConversationsService } from '../../services/conversations.service';
+import { MessagesInterface } from '../../models/messages.model';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [MatInputModule, MatIconModule],
+  imports: [
+    FormsModule,
+    MatInputModule,
+    MatIconModule,
+    CommonModule,
+    MessagesComponent,
+    RouterOutlet
+  ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
 export class ChatComponent implements OnInit {
-  constructor(private _userService: UserService) {}
+  
+  constructor(
+    private _userService: UserService,
+    private _router: Router,
+  ) {}
 
   user: any;
   users: User[] = [];
@@ -23,9 +47,9 @@ export class ChatComponent implements OnInit {
     this.getUser();
     this.getUsers();
   }
-
-  _router = inject(Router);
-
+  goToUser(user: string){
+    this._router.navigate([`chat/${user}`]);
+  }
   exitApp(): void {
     localStorage.removeItem('token');
     this._router.navigate(['login']);

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { alwaysAllowAuthGuard, authGuard } from './guards/auth.guard';
+import { ConversationMessagesComponent } from './pages/conversation-messages/conversation-messages.component';
 
 export const routes: Routes = [
   {
@@ -28,16 +29,20 @@ export const routes: Routes = [
         title: 'PulseChat | Chat',
         loadComponent: () =>
           import('./pages/chat/chat.component').then((p) => p.ChatComponent),
+          children: [{
+            path: ':userId',
+            component: ConversationMessagesComponent
+          }]
       },
     ],
   },
-  {
-    path: '**',
-    title: 'PulseChat | 404',
-    canActivate: [alwaysAllowAuthGuard],
-    loadComponent: () =>
-      import('./pages/not-found/not-found.component').then(
-        (p) => p.NotFoundComponent
-      ),
-  },
+  // {
+  //   path: '**',
+  //   title: 'PulseChat | 404',
+  //   canActivate: [alwaysAllowAuthGuard],
+  //   loadComponent: () =>
+  //     import('./pages/not-found/not-found.component').then(
+  //       (p) => p.NotFoundComponent
+  //     ),
+  // },
 ];

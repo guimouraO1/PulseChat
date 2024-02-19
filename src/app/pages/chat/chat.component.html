@@ -6,31 +6,25 @@
       <div class="header">
         <span>welcome back {{ user?.email }}</span>
       </div>
+
       <div class="search">
         <mat-form-field class="chat-input" appearance="outline">
           <input matInput placeholder="Search" />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
-        <!-- <mat-icon >person_add</mat-icon> -->
       </div>
 
       <div class="friends">
         @for (user of users; track $index) {
-        <div class="friends-card">
+        <div class="friends-card" (click)="goToUser(user.email)">
           <p>{{ user.email }}</p>
         </div>
         } @empty {
-          <p>No friends</p>
+        <p>No friends</p>
         }
-        <!-- <mat-icon class="add_new_chat">person_add</mat-icon> -->
       </div>
+      
     </div>
   </div>
-  <div class="chat">
-    <div class="chat-messages"></div>
-    <mat-form-field class="chat-input" appearance="outline">
-      <input matInput placeholder="Type a message" />
-      <mat-icon matSuffix>send</mat-icon>
-    </mat-form-field>
-  </div>
+  <router-outlet />
 </main>

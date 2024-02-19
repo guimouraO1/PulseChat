@@ -1,0 +1,16 @@
+<div class="chat">
+  <div class="chat-messages" #scrollPanel>
+    @for (message of messages; track $index) {
+    <app-messages [message]="message" />
+    }
+  </div>
+  <mat-form-field class="chat-input" appearance="outline">
+    <input
+      matInput
+      [(ngModel)]="inputMessage"
+      placeholder="Type a message"
+      (keyup.enter)="sendMessage()"
+    />
+    <mat-icon matSuffix>send</mat-icon>
+  </mat-form-field>
+</div>

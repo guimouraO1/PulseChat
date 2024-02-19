@@ -70,28 +70,7 @@
 
   }
 }
-.chat {
-  width: 75vw;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 20px;
-  // .chat-messages {
-  // }
-  .chat-input {
-    width: 90%;
-  }
-  /* Substitue a cor do texto do input */
-  input {
-    color: colors.$text-primary;
-  }
-  mat-icon {
-    color: colors.$primary;
-    cursor: pointer;
-  }
-}
+
 /* Substitue a cor da borda do input */
 ::ng-deep .mdc-button--outlined .mdc-button__ripple {
   border-color: #dee2e628;

@@ -1,0 +1,8 @@
+<div class="container" [class.isMine]="message.isMine">
+  <div class="balloon">
+    <span>{{ message.message }}</span>
+    <div class="time">
+        {{ message.time | date: 'hh:mm a' }}
+    </div>
+  </div>
+</div>

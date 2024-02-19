@@ -1,0 +1,30 @@
+span{
+    display: block;
+    
+}
+
+.container{
+    display: flex;
+    margin: 10px;
+
+    &.isMine{
+        justify-content: flex-end;
+        .balloon{
+            background-color: #2c4142;
+
+        }
+    }
+    .balloon{
+        background-color: #363d45;
+        padding: 10px 20px;
+        border-radius: 4px;
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+        .time{
+            font-size: x-small;
+            color: rgba(255, 255, 255, 0.432);
+        }
+    }
+
+}
