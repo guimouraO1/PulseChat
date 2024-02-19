@@ -12,9 +12,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { ConversationsService } from '../../services/conversations.service';
 import { UserService } from '../../services/user.service';
+import { map, tap } from 'rxjs';
 
 @Component({
   selector: 'app-conversation-messages',
@@ -35,10 +36,13 @@ export class ConversationMessagesComponent {
   @ViewChildren(MessagesComponent) messageComps!: QueryList<MessagesComponent>;
   @ViewChild('scrollPanel') scrollPanel!: ElementRef;
 
-  @Input({ required: true })
-  userId!: number;
+  constructor(
+    private conversationService: ConversationsService,
+    private activatedRoute: ActivatedRoute
+  ) {}
 
-  constructor(private conversationService: ConversationsService) {}
+  userId$ = this.activatedRoute.paramMap.pipe(
+    map((value) => value.get('userId')));
 
   protected messages: MessagesInterface[] = [];
   protected inputMessage = '';
@@ -50,7 +54,7 @@ export class ConversationMessagesComponent {
       time: new Date(),
       isMine: true,
       message: this.inputMessage,
-      id: this.userId,
+      id: this.userId$,
     });
 
     this.conversationService.publishMessages(2, this.inputMessage);

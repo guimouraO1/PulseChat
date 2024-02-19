@@ -16,7 +16,7 @@
 
       <div class="friends">
         @for (user of users; track $index) {
-        <div class="friends-card" (click)="goToUser(user.email)">
+        <div class="friends-card" (click)="goToUser(user.id)">
           <p>{{ user.email }}</p>
         </div>
         } @empty {

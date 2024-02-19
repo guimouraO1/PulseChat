@@ -47,8 +47,8 @@ export class ChatComponent implements OnInit {
     this.getUser();
     this.getUsers();
   }
-  goToUser(user: string){
-    this._router.navigate([`chat/${user}`]);
+  goToUser(user: any){
+    this._router.navigate(['chat', user]);
   }
   exitApp(): void {
     localStorage.removeItem('token');

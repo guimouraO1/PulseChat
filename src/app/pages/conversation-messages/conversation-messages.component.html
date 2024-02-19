@@ -1,4 +1,7 @@
 <div class="chat">
+  <div class="userInfo">
+    <span>User: {{ userId$ | async }}</span>
+  </div>
   <div class="chat-messages" #scrollPanel>
     @for (message of messages; track $index) {
     <app-messages [message]="message" />

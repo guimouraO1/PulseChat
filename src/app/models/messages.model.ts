@@ -1,5 +1,5 @@
 export interface MessagesInterface {
-    id: number,
+    id: any,
     message: string,
     isMine: boolean,
     time: Date
