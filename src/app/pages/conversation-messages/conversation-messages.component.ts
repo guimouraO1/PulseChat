@@ -1,7 +1,6 @@
 import {
   Component,
   ElementRef,
-  Input,
   QueryList,
   ViewChild,
   ViewChildren,
@@ -12,10 +11,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
-import { ConversationsService } from '../../services/conversations.service';
-import { UserService } from '../../services/user.service';
-import { map, tap } from 'rxjs';
+import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-conversation-messages',
@@ -33,11 +30,11 @@ import { map, tap } from 'rxjs';
   ],
 })
 export class ConversationMessagesComponent {
+  
   @ViewChildren(MessagesComponent) messageComps!: QueryList<MessagesComponent>;
   @ViewChild('scrollPanel') scrollPanel!: ElementRef;
 
   constructor(
-    private conversationService: ConversationsService,
     private activatedRoute: ActivatedRoute
   ) {}
 
@@ -57,7 +54,6 @@ export class ConversationMessagesComponent {
       id: this.userId$,
     });
 
-    this.conversationService.publishMessages(2, this.inputMessage);
     this.inputMessage = '';
   }
 

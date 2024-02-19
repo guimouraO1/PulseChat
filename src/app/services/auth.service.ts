@@ -35,27 +35,6 @@ export class AuthService {
       });
   }
 
-  // register(email: string, password: string, confirmPassword: string) {
-  //   this.http
-  //     .post(`${this.urlApi}/user`, {
-  //       email,
-  //       password,
-  //       confirmPassword,
-  //     })
-  //     .pipe(take(1))
-  //     .subscribe({
-  //       next: (res: any) => {
-  //         if (res.register) {
-  //           this.router.navigate(['']);
-  //           this.openSnackBar('Register successful!', '');
-  //         }
-  //       },
-  //       error: (e: any) => {
-  //         this.openSnackBar(e.error.msg, '');
-  //       },
-  //     });
-  // }
-
   async asycUserAuthentication() {
     const authToken = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${authToken}`);

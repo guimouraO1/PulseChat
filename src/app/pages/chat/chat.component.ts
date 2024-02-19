@@ -1,23 +1,16 @@
 import {
-  AfterViewInit,
   Component,
-  ElementRef,
   OnInit,
-  QueryList,
-  ViewChild,
-  ViewChildren,
 } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
-import { take, takeUntil } from 'rxjs';
+import { take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MessagesComponent } from '../../components/messages/messages.component';
 import { FormsModule } from '@angular/forms';
-import { ConversationsService } from '../../services/conversations.service';
-import { MessagesInterface } from '../../models/messages.model';
 
 @Component({
   selector: 'app-chat',
@@ -47,9 +40,11 @@ export class ChatComponent implements OnInit {
     this.getUser();
     this.getUsers();
   }
-  goToUser(user: any){
-    this._router.navigate(['chat', user]);
+
+  goToUser(userId: any){
+    this._router.navigate(['chat', userId]);
   }
+
   exitApp(): void {
     localStorage.removeItem('token');
     this._router.navigate(['login']);
