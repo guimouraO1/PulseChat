@@ -8,6 +8,7 @@
     justify-content: flex-end;
     align-items: center;
     gap: 20px;
+    
     .userInfo{
       display: flex;
       align-items: center;
@@ -15,7 +16,6 @@
       width: 90%;
       height: 10%;
       padding: 0px 20px;
-      border: 1px solid #dee2e628;
       border-radius: 4px;
     }
     .chat-input {

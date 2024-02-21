@@ -11,7 +11,6 @@ span{
         justify-content: flex-end;
         .balloon{
             background-color: #2c4142;
-
         }
     }
     .balloon{
@@ -19,12 +18,15 @@ span{
         padding: 10px 20px;
         border-radius: 4px;
         display: flex;
+        flex-direction: column;
+        overflow-wrap: anywhere;
         align-items: flex-end;
-        gap: 20px;
+        max-width: 45%;
         .time{
+            display: block;
+            margin-left: 10px;
             font-size: x-small;
             color: rgba(255, 255, 255, 0.432);
         }
     }
-
 }

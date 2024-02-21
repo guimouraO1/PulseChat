@@ -1,5 +1,6 @@
 export interface MessagesInterface {
-    id: any,
+    authorMessageId: string,
+    recipientId: string,
     message: string,
     isMine: boolean,
     time: Date

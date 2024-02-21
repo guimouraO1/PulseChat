@@ -1,8 +1,8 @@
 <div class="container" [class.isMine]="message.isMine">
   <div class="balloon">
     <span>{{ message.message }}</span>
-    <div class="time">
+    <span class="time">
         {{ message.time | date: 'hh:mm a' }}
-    </div>
+    </span>
   </div>
 </div>

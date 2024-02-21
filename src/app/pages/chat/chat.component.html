@@ -4,7 +4,10 @@
       <mat-icon (click)="exitApp()" class="exit-button">exit_to_app</mat-icon>
 
       <div class="header">
-        <span>welcome back {{ user?.email }}</span>
+        <span>Welcome back
+          <span style="color: darkslateblue">{{ user?.email }}
+        </span>
+        </span>
       </div>
 
       <div class="search">
@@ -23,7 +26,6 @@
         <p>No friends</p>
         }
       </div>
-      
     </div>
   </div>
   <router-outlet />
