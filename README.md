@@ -1,27 +1,45 @@
-# PulseChat
+# PulseChat - Chat Application
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.7.
+## Descrição
 
-## Development server
+PulseChat é uma aplicação de chat desenvolvida em AngularJS que utiliza Socket.IO para comunicação em tempo real e autenticação JWT (JSON Web Token) para garantir segurança e integridade nas interações dos usuários. Esta aplicação permite que os usuários troquem mensagens instantâneas de forma eficiente e segura.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Requisitos
 
-## Code scaffolding
+### Requisitos Funcionais
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+[x] **Autenticação de Usuário:** Os usuários devem poder se autenticar na aplicação utilizando JWT.
 
-## Build
+[x] **Chat em Tempo Real:** A aplicação deve fornecer um sistema de chat em tempo real, permitindo que os usuários troquem mensagens instantaneamente.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+[] **Gerenciamento de Usuários:** Os usuários devem poder adicionar, remover e bloquear outros usuários.
 
-## Running unit tests
+[] **Notificações:** A aplicação deve fornecer notificações em tempo real para novas mensagens, solicitações de amizade e outras interações relevantes.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+[] **Interface de Usuário Intuitiva:** A interface de usuário deve ser intuitiva e fácil de usar, garantindo uma experiência agradável para os usuários.
 
-## Running end-to-end tests
+[] **Segurança:** Todas as interações devem ser seguras e protegidas por autenticação JWT.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Requisitos Não Funcionais
 
-## Further help
+[] **Desempenho:** A aplicação deve ser responsiva e ter baixa latência para garantir uma experiência de chat suave.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+[] **Escalabilidade:** A arquitetura da aplicação deve ser escalável para lidar com um grande número de usuários simultâneos.
+
+[] **Segurança:** Deve ser implementado um mecanismo robusto de segurança para proteger os dados dos usuários e prevenir ataques.
+
+## Tecnologias Utilizadas
+
+- **AngularJS:** Framework JavaScript para construção da interface de usuário.
+- **Socket.IO:** Biblioteca para comunicação em tempo real entre cliente e servidor.
+- **JWT (JSON Web Token):** Mecanismo de autenticação seguro.
+- **Node.js:** Plataforma para execução do servidor backend.
+- **Express:** Framework para construção de aplicativos web com Node.js.
+
+## Autor
+
+Este projeto foi desenvolvido por [Guilherme de Moura Oliveira](https://github.com/guimouraO1).
+
+## Licença
+
+Este projeto está licenciado sob a [Licença MIT](https://opensource.org/licenses/MIT).

@@ -1,18 +1,19 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { Observable, take } from 'rxjs';
+import { Observable } from 'rxjs';
 import { MessagesInterface } from '../models/messages.model';
 import { UserService } from './user.service';
-import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
 })
+
 export class ChatService {
+  
   private socket: Socket;
   protected user: any;
 
-  constructor(private userService: UserService) {
+  constructor() {
     this.socket = io('ws://localhost:3000');
   }
 

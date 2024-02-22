@@ -38,11 +38,8 @@ export class AuthService {
   async asycUserAuthentication() {
     const authToken = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${authToken}`);
-
     try {
-      const res: any = await lastValueFrom(
-        this.http.get(`${this.urlApi}/user/auth`, { headers }).pipe(take(1))
-      );
+      await lastValueFrom(this.http.get(`${this.urlApi}/user/auth`, { headers }).pipe(take(1)));
       this._isAuthenticated = true;
       return true;
     } catch (e) {

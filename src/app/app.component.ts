@@ -10,5 +10,5 @@ import { HttpClientModule } from '@angular/common/http';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
-  title = 'PulseChat';
+  // title = 'PulseChat';
 }

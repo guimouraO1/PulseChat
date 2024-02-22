@@ -12,6 +12,7 @@ export class UserService {
   private urlApi = `${environment.url}`;
 
   constructor(public authService: AuthService, private http: HttpClient) {}
+  
   getUser(): Observable<User[]> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${token}`);

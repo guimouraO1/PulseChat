@@ -1,10 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
-import { Subscription, take } from 'rxjs';
+import { Observable, Subscription, map, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MessagesComponent } from '../../components/messages/messages.component';
 import { FormsModule } from '@angular/forms';
@@ -25,39 +31,56 @@ import { ChatService } from '../../services/chat.service';
   styleUrl: './chat.component.scss',
 })
 export class ChatComponent implements OnInit {
-
   constructor(
-    private _userService: UserService,
-    private _router: Router,
-    private _chatService: ChatService,
+    private userService: UserService,
+    private router: Router,
+    private chatService: ChatService,
+    private activatedRoute: ActivatedRoute,
   ) {}
 
   user: any;
   users: User[] = [];
   userSendId: any;
+  recipientEmail = '';
+  recipientValue = this.activatedRoute.paramMap.pipe(
+    map((value) => value.get('userId'))
+  );
 
   ngOnInit() {
     this.getUser();
     this.getUsers();
+    this.router.navigate(['chat'])
   }
 
-  goToUser(userId: any) {
-    this._router.navigate(['chat', userId]);
+  @Output() myEmmiter = new EventEmitter<string>();
+
+  goToUser(userId: any, userEmail: string) {
+    this.recipientEmail = userEmail;
+    this.myEmmiter.next(userEmail);
+    this.router.navigate(['chat', userId]);
+  }
+
+  getFirstEmail(){
+    return this.recipientEmail;
+  }
+  
+  getClickEvent(): Observable<string> {
+    return this.myEmmiter.asObservable();
   }
 
   exitApp(): void {
     localStorage.removeItem('token');
-    this._router.navigate(['login']);
+    this.router.navigate(['login']);
   }
 
   getUser() {
-    this._userService
+    this.userService
       .getUser()
       .pipe(take(1))
       .subscribe({
         next: (_user: User[]) => {
           this.user = _user;
-          this._chatService.connect(this.user);
+          this.chatService.connect(this.user);
         },
         error: () => {
           // console.error('Erro ao obter usuário:', error);
@@ -66,7 +89,7 @@ export class ChatComponent implements OnInit {
   }
 
   getUsers() {
-    this._userService
+    this.userService
       .getUsers()
       .pipe(take(1))
       .subscribe({

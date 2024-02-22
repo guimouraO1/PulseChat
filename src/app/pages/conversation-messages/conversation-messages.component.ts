@@ -13,9 +13,11 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
-import { map, take } from 'rxjs';
+import { Subscription, map, take } from 'rxjs';
 import { ChatService } from '../../services/chat.service';
 import { UserService } from '../../services/user.service';
+import { ChatComponent } from '../chat/chat.component';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-conversation-messages',
@@ -40,35 +42,60 @@ export class ConversationMessagesComponent implements OnInit {
   protected messages: MessagesInterface[] = [];
   protected inputMessage = '';
   userId: any;
-  roomId: any;
   recipientId: any;
-  timeNow = new Date();
-
-  // recipientId = this.activatedRoute.paramMap.pipe(
-  //   map((value) => value.get('userId'))
-  // );
+  recipientEmail = '';
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private chatService: ChatService,
-    private _userService: UserService
-  ) {
+    private userService: UserService,
+    private chatComponent: ChatComponent
+  ) {}
+  ngOnInit(): void {
+    // Get the first email after click in the contact
+    this.recipientEmail = this.chatComponent.getFirstEmail();
+    this.initializeUser();
+    this.listenForRecipientChange();
+    this.listenForParameterChange();
+    this.fetchMessages();
   }
 
-  ngOnInit(): void {
-    this.getUser();
+  initializeUser(): void {
+    this.userService.getUser()
+      .pipe(take(1))
+      .subscribe({
+        next: (_user: any) => {
+          this.userId = _user.id;
+        },
+        error: () => {
+          // Handle error
+        },
+      });
+  }
 
+  listenForRecipientChange(): void {
+    this.chatComponent.getClickEvent()
+      .subscribe((userEmail: string) => {
+        this.recipientEmail = userEmail;
+      });
+  }
+
+  listenForParameterChange(): void {
     this.activatedRoute.paramMap.subscribe((params) => {
       this.recipientId = params.get('userId');
       this.messages = [];
     });
-    
+  }
+
+  fetchMessages(): void {
     this.chatService.getMessages().subscribe((message: any) => {
-      if(message.authorMessageId !== parseInt(this.recipientId) && message.authorMessageId !== this.userId){
+      if (
+        message.authorMessageId !== parseInt(this.recipientId) &&
+        message.authorMessageId !== this.userId
+      ) {
         return;
       }
-
-      return this.messages.push({
+      this.messages.push({
         authorMessageId: message.authorMessageId,
         recipientId: message.recipientId,
         time: message.time,
@@ -78,39 +105,27 @@ export class ConversationMessagesComponent implements OnInit {
     });
   }
 
-  getUser() {
-    this._userService
-      .getUser()
-      .pipe(take(1))
-      .subscribe({
-        next: (_user: any) => {
-          this.userId = _user.id;
-        },
-        error: () => {
-          // console.error('Erro ao obter usuário:', error);
-        },
-      });
-  }
-
-  getRoomId(): string {
-    const roomId = [this.userId, this.recipientId].sort().join('').toLowerCase();
-    return roomId;
-  }
-
-  sendMessage() {
+  sendMessage(): void {
     if (!this.inputMessage) return;
-    this.chatService.sendMessage(this.inputMessage, this.userId, parseInt(this.recipientId), new Date());
+    this.chatService.sendMessage(
+      this.inputMessage,
+      this.userId,
+      parseInt(this.recipientId),
+      new Date()
+    );
     this.inputMessage = '';
+  }
+
+  scrollToLast(): void {
+    try {
+      this.scrollPanel.nativeElement.scrollTop =
+        this.scrollPanel.nativeElement.scrollHeight;
+    } catch (error) {
+      // Handle error
+    }
   }
 
   ngAfterViewInit(): void {
     this.messageComps.changes.subscribe(() => this.scrollToLast());
-  }
-
-  scrollToLast() {
-    try {
-      this.scrollPanel.nativeElement.scrollTop =
-        this.scrollPanel.nativeElement.scrollHeight;
-    } catch (error) {}
   }
 }
