@@ -13,11 +13,10 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
-import { Subscription, map, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ChatService } from '../../services/chat.service';
 import { UserService } from '../../services/user.service';
 import { ChatComponent } from '../chat/chat.component';
-import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-conversation-messages',

@@ -1,7 +1,6 @@
 import {
   Component,
   EventEmitter,
-  OnDestroy,
   OnInit,
   Output,
 } from '@angular/core';
@@ -10,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
-import { Observable, Subscription, map, take } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MessagesComponent } from '../../components/messages/messages.component';
 import { FormsModule } from '@angular/forms';

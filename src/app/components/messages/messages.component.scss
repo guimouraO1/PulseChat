@@ -1,32 +1,31 @@
-span{
-    display: block;
-    
+span {
+  display: block;
 }
 
-.container{
-    display: flex;
-    margin: 10px;
+.container {
+  display: flex;
+  margin: 10px;
 
-    &.isMine{
-        justify-content: flex-end;
-        .balloon{
-            background-color: #2c4142;
-        }
+  &.isMine {
+    justify-content: flex-end;
+    .balloon {
+      background-color: #2c4142;
     }
-    .balloon{
-        background-color: #363d45;
-        padding: 10px 20px;
-        border-radius: 4px;
-        display: flex;
-        flex-direction: column;
-        overflow-wrap: anywhere;
-        align-items: flex-end;
-        max-width: 45%;
-        .time{
-            display: block;
-            margin-left: 10px;
-            font-size: x-small;
-            color: rgba(255, 255, 255, 0.432);
-        }
+  }
+  .balloon {
+    background-color: #363d45;
+    padding: 10px 20px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow-wrap: anywhere;
+    align-items: flex-end;
+    max-width: 45%;
+    .time {
+      display: block;
+      margin-left: 10px;
+      font-size: x-small;
+      color: rgba(255, 255, 255, 0.432);
     }
+  }
 }

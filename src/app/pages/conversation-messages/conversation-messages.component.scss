@@ -1,52 +1,54 @@
 @use '../../../assets/colors/colors.scss' as colors;
 
 .chat {
-    width: 75vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 20px;
-    
-    .userInfo{
-      display: flex;
-      align-items: center;
-      color: white;
-      width: 90%;
-      height: 10%;
-      padding: 0px 20px;
-      border-radius: 4px;
-    }
-    .chat-input {
-      width: 90%;
-    }
-    /* Substitue a cor do texto do input */
-    input {
-      color: colors.$text-primary;
-    }
-    mat-icon {
-      color: colors.$primary;
-      cursor: pointer;
-    }
-    .chat-messages{
-      width: 90%;
-      height: 70%;
-      overflow: auto;
-      padding: 0px 20px;
-  
-      &::-webkit-scrollbar {
-        width: 7px;
-    
-        &-track {
-          background-color: transparent;
-        }
-    
-        &-thumb {
-          background-color: colors.$background2;
-          border-radius: 7px;
-        }
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100vh;
+  justify-content: flex-end;
+  width: 75vw;
+
+  .chat-input {
+    width: 90%;
+  }
+
+  .chat-messages {
+    height: 70%;
+    overflow: auto;
+    padding: 0px 20px;
+    width: 90%;
+
+    &::-webkit-scrollbar {
+      width: 7px;
+
+      &-thumb {
+        background-color: colors.$background2;
+        border-radius: 7px;
+      }
+
+      &-track {
+        background-color: transparent;
       }
     }
   }
-  
+
+  .userInfo {
+    align-items: center;
+    border-radius: 4px;
+    color: white;
+    display: flex;
+    height: 10%;
+    padding: 0px 20px;
+    width: 90%;
+  }
+
+  input {
+    color: colors.$text-primary;
+  }
+
+  mat-icon {
+    color: colors.$primary;
+    cursor: pointer;
+  }
+}
