@@ -59,7 +59,7 @@ export class ChatComponent implements OnInit {
     this.router.navigate(['chat', userId]);
   }
 
-  getFirstEmail(){
+  getFirstId(){
     return this.recipientEmail;
   }
   

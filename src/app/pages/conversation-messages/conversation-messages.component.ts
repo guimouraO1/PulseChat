@@ -51,13 +51,30 @@ export class ConversationMessagesComponent implements OnInit {
     private chatComponent: ChatComponent
   ) {}
   ngOnInit(): void {
-    // Get the first email after click in the contact
-    this.recipientEmail = this.chatComponent.getFirstEmail();
+    // Get the first id after click in the contact
+    this.recipientEmail = this.chatComponent.getFirstId();
     this.initializeUser();
     this.listenForRecipientChange();
     this.listenForParameterChange();
     this.fetchMessages();
   }
+
+  getMessages(recipientId: string){
+    this.chatService.getMessagesDb(recipientId)
+    .subscribe({
+      next: (messages: any) => {
+        const messagesList = messages.map((message: MessagesInterface) => ({
+            ...message,
+            isMine: message.authorMessageId === this.userId
+        }));
+        this.messages = messagesList;
+        // console.log(messagesList);
+      },
+      error: () => {
+        // Handle error
+      },
+    });
+}
 
   initializeUser(): void {
     this.userService.getUser()
@@ -74,8 +91,8 @@ export class ConversationMessagesComponent implements OnInit {
 
   listenForRecipientChange(): void {
     this.chatComponent.getClickEvent()
-      .subscribe((userEmail: string) => {
-        this.recipientEmail = userEmail;
+      .subscribe((userId: string) => {
+        this.recipientEmail = userId;
       });
   }
 
@@ -83,13 +100,14 @@ export class ConversationMessagesComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe((params) => {
       this.recipientId = params.get('userId');
       this.messages = [];
+      this.getMessages(this.recipientId);
     });
   }
 
   fetchMessages(): void {
     this.chatService.getMessages().subscribe((message: any) => {
       if (
-        message.authorMessageId !== parseInt(this.recipientId) &&
+        message.authorMessageId !== this.recipientId &&
         message.authorMessageId !== this.userId
       ) {
         return;
@@ -109,7 +127,7 @@ export class ConversationMessagesComponent implements OnInit {
     this.chatService.sendMessage(
       this.inputMessage,
       this.userId,
-      parseInt(this.recipientId),
+      this.recipientId,
       new Date()
     );
     this.inputMessage = '';
