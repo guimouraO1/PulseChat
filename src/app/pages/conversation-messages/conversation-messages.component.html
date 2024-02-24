@@ -2,11 +2,12 @@
   <div class="userInfo">
     <span>Talking to: {{ recipientEmail }}</span>
   </div>
-  <div class="chat-messages" #scrollPanel>
+  <div class="chat-messages" #scrollPanel (scroll)="scrollOnTop()">
     @for (message of messages; track $index) {
     <app-messages [message]="message" />
     }
   </div>
+  <div #bottomMarker></div>
   <mat-form-field class="chat-input" appearance="outline">
     <input
       matInput

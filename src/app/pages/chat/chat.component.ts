@@ -37,6 +37,7 @@ export class ChatComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
   ) {}
 
+  @Output() myEmmiter = new EventEmitter<string>();
   user: any;
   users: User[] = [];
   userSendId: any;
@@ -48,10 +49,8 @@ export class ChatComponent implements OnInit {
   ngOnInit() {
     this.getUser();
     this.getUsers();
-    this.router.navigate(['chat'])
+    this.router.navigate(['chat']);
   }
-
-  @Output() myEmmiter = new EventEmitter<string>();
 
   goToUser(userId: any, userEmail: string) {
     this.recipientEmail = userEmail;

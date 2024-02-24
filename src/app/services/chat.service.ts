@@ -35,16 +35,16 @@ export class ChatService {
     });
   }
 
-  getMessagesDb(recipientId: string): Observable<any> {
+
+  getMessagesDb(recipientId: any, offset: number, limit: number): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${token}`);
-    
-    // Adicione o recipientId como parâmetro na URL
-    const url = `${this.urlApi}/messages?recipientId=${recipientId}`;
+
+    // Adicione o recipientId, offset e limit como parâmetros na URL
+    const url = `${this.urlApi}/messages?recipientId=${recipientId}&offset=${offset}&limit=${limit}`;
 
     return this.http.get(url, { headers });
   }
-
 
   getMessages(): Observable<MessagesInterface> {
     return new Observable((observer) => {

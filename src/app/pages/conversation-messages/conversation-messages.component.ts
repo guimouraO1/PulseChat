@@ -34,7 +34,6 @@ import { ChatComponent } from '../chat/chat.component';
   ],
 })
 export class ConversationMessagesComponent implements OnInit {
-  
   @ViewChildren(MessagesComponent) messageComps!: QueryList<MessagesComponent>;
   @ViewChild('scrollPanel') scrollPanel!: ElementRef;
 
@@ -43,6 +42,8 @@ export class ConversationMessagesComponent implements OnInit {
   userId: any;
   recipientId: any;
   recipientEmail = '';
+  offset = 0;
+  limit = 11; // Defina o número inicial de mensagens a serem carregadas
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -50,6 +51,7 @@ export class ConversationMessagesComponent implements OnInit {
     private userService: UserService,
     private chatComponent: ChatComponent
   ) {}
+
   ngOnInit(): void {
     // Get the first id after click in the contact
     this.recipientEmail = this.chatComponent.getFirstId();
@@ -59,25 +61,26 @@ export class ConversationMessagesComponent implements OnInit {
     this.fetchMessages();
   }
 
-  getMessages(recipientId: string){
-    this.chatService.getMessagesDb(recipientId)
-    .subscribe({
+  getMessages(recipientId: string, offset: number, limit: number): void {
+    this.chatService.getMessagesDb(recipientId, offset, limit).subscribe({
       next: (messages: any) => {
-        const messagesList = messages.map((message: MessagesInterface) => ({
-            ...message,
-            isMine: message.authorMessageId === this.userId
+        console.log(messages);
+        const newMessages = messages.map((message: MessagesInterface) => ({
+          ...message,
+          isMine: message.authorMessageId === this.userId,
         }));
-        this.messages = messagesList;
-        // console.log(messagesList);
+        // Adiciona as novas mensagens no início da lista existente
+        this.messages = [...newMessages.reverse(), ...this.messages];
       },
       error: () => {
         // Handle error
       },
     });
-}
+  }
 
   initializeUser(): void {
-    this.userService.getUser()
+    this.userService
+      .getUser()
       .pipe(take(1))
       .subscribe({
         next: (_user: any) => {
@@ -90,17 +93,16 @@ export class ConversationMessagesComponent implements OnInit {
   }
 
   listenForRecipientChange(): void {
-    this.chatComponent.getClickEvent()
-      .subscribe((userId: string) => {
-        this.recipientEmail = userId;
-      });
+    this.chatComponent.getClickEvent().subscribe((userId: string) => {
+      this.recipientEmail = userId;
+    });
   }
 
   listenForParameterChange(): void {
     this.activatedRoute.paramMap.subscribe((params) => {
       this.recipientId = params.get('userId');
       this.messages = [];
-      this.getMessages(this.recipientId);
+      this.getMessages(this.recipientId, this.offset, this.limit);
     });
   }
 
@@ -131,15 +133,21 @@ export class ConversationMessagesComponent implements OnInit {
       new Date()
     );
     this.inputMessage = '';
+    this.messageComps.changes.subscribe(() => this.scrollToLast());
+  }
+
+  scrollOnTop(): void {
+    if (this.scrollPanel.nativeElement.scrollTop === 0) {
+      this.offset += this.limit;
+      this.getMessages(this.recipientId, this.offset, this.limit);
+    }
   }
 
   scrollToLast(): void {
     try {
       this.scrollPanel.nativeElement.scrollTop =
         this.scrollPanel.nativeElement.scrollHeight;
-    } catch (error) {
-      // Handle error
-    }
+    } catch (error) {}
   }
 
   ngAfterViewInit(): void {
