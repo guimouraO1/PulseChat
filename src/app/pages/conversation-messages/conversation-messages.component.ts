@@ -102,6 +102,8 @@ export class ConversationMessagesComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe((params) => {
       this.recipientId = params.get('userId');
       this.messages = [];
+      this.offset = 0;
+      this.limit = 11;
       this.getMessages(this.recipientId, this.offset, this.limit);
     });
   }
