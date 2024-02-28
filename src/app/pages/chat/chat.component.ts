@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
-import { Observable, map, take } from 'rxjs';
+import { Observable, firstValueFrom, map, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MessagesComponent } from '../../components/messages/messages.component';
 import { FormsModule } from '@angular/forms';
@@ -50,28 +50,28 @@ export class ChatComponent implements OnInit {
     map((value) => value.get('userId'))
   );
 
-  ngOnInit() {
-    this.getUser();
-    this.getUsers();
-
+  async ngOnInit() {
+    await this.getUser();
+    await this.getUsers();
     this.fetchMessages();
+    this.setupMessageListeners();
+    this.navigateToChat();
+  }
 
+  setupMessageListeners() {
     this.chatService.newMessageEmmiter.subscribe((newMessage: boolean) => {
       this.newMessages = newMessage;
     });
-
+  
     this.chatService.newMessageEmmiterId.subscribe((newMessageId: string) => {
       this.newMessagesId.add(newMessageId);
     });
-
-    this.router.navigate(['chat']);
   }
 
   getMessages(recipientId: string, offset: number, limit: number): void {
     this.chatService.getMessagesDb(recipientId, offset, limit).subscribe({
       next: (messages: any) => {
         messages.forEach((message: MessagesInterface) => {
-          console.log(message.read);
           if (JSON.parse(message.read) === false) {
             this.newMessages = true;
             this.newMessagesId.add(message.authorMessageId);
@@ -137,39 +137,35 @@ export class ChatComponent implements OnInit {
     this.router.navigate(['login']);
   }
 
-  getUser() {
-    this.userService
-      .getUser()
-      .pipe(take(1))
-      .subscribe({
-        next: (_user: User[]) => {
-          this.user = _user;
-          this.chatService.connect(this.user);
-        },
-        error: () => {
-          // console.error('Erro ao obter usuário:', error);
-        },
-      });
+  async getUser() {
+    try {
+      const user = await firstValueFrom(this.userService.getUser());
+      this.user = user;
+      this.chatService.connect(this.user);
+    } catch (error) {
+      // Trate o erro aqui
+      console.error('Erro ao obter usuário:', error);
+    }
   }
-
-  getUsers() {
-    this.userService
-      .getUsers()
-      .pipe(take(1))
-      .subscribe({
-        next: (users: User[] = []) => {
-          this.users = users;
-
-          // Itera sobre todos os usuários
-          this.users.forEach((user: User) => {
-            console.log(user.id);
-            // Chama a função getMessages para cada usuário
-            this.getMessages(user.id, 0, 1);
-          });
-        },
-        error: () => {
-          // console.error('Erro ao obter usuário:', error);
-        },
+  
+  async getUsers() {
+    try {
+      const users = await firstValueFrom(this.userService.getUsers());
+      this.users = users;
+  
+      // Itera sobre todos os usuários
+      this.users.forEach(async (user: User) => {
+        // Chama a função getMessages para cada usuário
+        await this.getMessages(user.id, 0, 1);
       });
+    } catch (error) {
+      // Trate o erro aqui
+      console.error('Erro ao obter usuários:', error);
+    }
   }
+  
+  navigateToChat(){
+    this.router.navigate(['chat']);
+  }
+  
 }

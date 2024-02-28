@@ -1,7 +1,6 @@
 <main class="main-container">
   <div class="side-nav">
     <div class="side-nav-content">
-      
       <div class="menu">
         <button mat-icon-button [matMenuTriggerFor]="menu">
           <mat-icon>menu</mat-icon>
@@ -19,29 +18,39 @@
       </div>
 
       <div class="header">
-        <span>Welcome back <span class="username">{{ user?.name }} </span></span>
+          <span>Welcome back <span class="username">{{ user.name }} </span></span>
       </div>
 
-      <div class="search">
-        <mat-form-field class="chat-input" appearance="outline">
-          <input matInput placeholder="Search" />
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
-      </div>
+        <div class="search">
+          <mat-form-field class="chat-input" appearance="outline">
+            <input matInput placeholder="Search" #searchField />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
 
       <div class="friends">
         @for (user of users; track $index) {
         <div class="friends-card" (click)="goToUser(user.id, user.name)">
           <p>{{ user.name }}</p>
           @if (newMessages && this.newMessagesId.has(user.id)) {
-              <mat-icon matBadge="1" matBadgeSize="small" matBadgeColor="warn" >mail_outline</mat-icon>
-          }@else {
+          <div
+            matBadge="1"
+            matBadgeSize="small"
+            matBadgeOverlap="friends-card"
+            matBadgeColor="warn"
+          >
             <mat-icon>mail_outline</mat-icon>
+          </div>
+          }@else {
+          <mat-icon>mail_outline</mat-icon>
           }
         </div>
 
         } @empty {
-        <p>No friends</p>
+        <div class="friends-card">
+          <p>No Friends</p>
+          <mat-icon>mail_outline</mat-icon>
+        </div>
         }
       </div>
     </div>

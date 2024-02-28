@@ -1,5 +1,6 @@
 @use "../../../assets/colors/colors.scss" as colors;
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Protest+Riot&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
 
 .side-nav {
   
@@ -120,4 +121,15 @@ mat-label {
 
 ::ng-deep input::placeholder {
   color: #dee2e628 !important;
+}
+
+:host ::ng-deep .mat-badge-content 
+{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: xx-small !important;
+  font-family: "Noto Sans KR", sans-serif;
+
+
 }
