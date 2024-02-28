@@ -1,4 +1,5 @@
 export interface MessagesInterface {
+    id: string,
     authorMessageId: string,
     recipientId: string,
     message: string,

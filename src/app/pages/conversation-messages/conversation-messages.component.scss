@@ -1,4 +1,4 @@
-@use '../../../assets/colors/colors.scss' as colors;
+@use "../../../assets/colors/colors.scss" as colors;
 
 .chat {
   align-items: center;
@@ -9,8 +9,17 @@
   justify-content: flex-end;
   width: 75vw;
 
-  .chat-input {
+  .userInfo {
+    align-items: center;
+    border-radius: 4px;
+    color: colors.$text-primary;
+    display: flex;
+    height: 10%;
+    padding: 0px 20px;
     width: 90%;
+    .username {
+      color: colors.$primary;
+    }
   }
 
   .chat-messages {
@@ -33,25 +42,14 @@
     }
   }
 
-  .userInfo {
-    align-items: center;
-    border-radius: 4px;
-    color: white;
-    display: flex;
-    height: 10%;
-    padding: 0px 20px;
+  .chat-input {
     width: 90%;
-    .username{
-      color: colors.$primary;
+    input {
+      color: colors.$text-primary;
     }
-  }
-
-  input {
-    color: colors.$text-primary;
-  }
-
-  mat-icon {
-    color: colors.$primary;
-    cursor: pointer;
+    mat-icon {
+      color: colors.$primary;
+      cursor: pointer;
+    }
   }
 }
