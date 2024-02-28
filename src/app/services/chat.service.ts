@@ -34,12 +34,15 @@ export class ChatService {
       message,
       authorMessageId,
       recipientId,
-      time
+      time,
     });
   }
 
-
-  getMessagesDb(recipientId: any, offset: number, limit: number): Observable<any> {
+  getMessagesDb(
+    recipientId: any,
+    offset: number,
+    limit: number
+  ): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${token}`);
 
@@ -48,6 +51,17 @@ export class ChatService {
 
     return this.http.get(url, { headers });
   }
+
+  updateMessageAsRead(authorMessageId: string, recipientId: string): Observable<any> {
+    const url = `${this.urlApi}/messages`;
+    const data = {
+      authorMessageId: authorMessageId,
+      recipientId: recipientId
+    };
+  
+    return this.http.put(url, data);
+  }
+  
 
   getMessages(): Observable<MessagesInterface> {
     return new Observable((observer) => {

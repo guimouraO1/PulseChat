@@ -1,9 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -15,9 +10,8 @@ import { MessagesComponent } from '../../components/messages/messages.component'
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../services/chat.service';
 import { MatMenuModule } from '@angular/material/menu';
-import {MatButtonModule} from '@angular/material/button';
-import {MatBadgeModule} from '@angular/material/badge';
-import { forkJoin } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MessagesInterface } from '../../models/messages.model';
 
 @Component({
@@ -32,7 +26,7 @@ import { MessagesInterface } from '../../models/messages.model';
     MessagesComponent,
     RouterOutlet,
     MatButtonModule,
-    MatBadgeModule
+    MatBadgeModule,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -42,42 +36,59 @@ export class ChatComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private chatService: ChatService,
-    private activatedRoute: ActivatedRoute,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   @Output() myEmmiter = new EventEmitter<string>();
   user: any;
   users: User[] = [];
   recipientId: any;
-  userSendId: any;
-  recipientEmail = '';
+  recipientName = '';
   newMessages = false;
-  newMessagesId = '';
+  newMessagesId: Set<any> = new Set();
   recipientValue = this.activatedRoute.paramMap.pipe(
     map((value) => value.get('userId'))
   );
 
   ngOnInit() {
-    this.fetchMessages();
-
-    this.chatService.newMessageEmmiter.subscribe((data: any) => {
-      this.newMessages = data;
-    });
-
-    this.chatService.newMessageEmmiterId.subscribe((data: any) => {
-      this.newMessagesId = data;
-    });
-    
     this.getUser();
     this.getUsers();
+
+    this.fetchMessages();
+
+    this.chatService.newMessageEmmiter.subscribe((newMessage: boolean) => {
+      this.newMessages = newMessage;
+    });
+
+    this.chatService.newMessageEmmiterId.subscribe((newMessageId: string) => {
+      this.newMessagesId.add(newMessageId);
+    });
+
     this.router.navigate(['chat']);
+  }
+
+  getMessages(recipientId: string, offset: number, limit: number): void {
+    this.chatService.getMessagesDb(recipientId, offset, limit).subscribe({
+      next: (messages: any) => {
+        messages.forEach((message: MessagesInterface) => {
+          console.log(message.read);
+          if (JSON.parse(message.read) === false) {
+            this.newMessages = true;
+            this.newMessagesId.add(message.authorMessageId);
+            return;
+          } else{
+            this.newMessagesId.delete(message.authorMessageId);
+          }
+        });
+      },
+      error: () => {
+      },
+    });
   }
 
   fetchMessages(): void {
     this.chatService.getMessages().subscribe((message: any) => {
-      if (
-        message.authorMessageId !== this.user.id
-      ) {
+      if (message.authorMessageId !== this.user.id) {
         this.chatService.newMessageEmmiter.emit(true);
         this.chatService.newMessageEmmiterId.emit(message.authorMessageId);
         return;
@@ -85,18 +96,38 @@ export class ChatComponent implements OnInit {
     });
   }
 
-  goToUser(userId: any, userName: string) {
-    this.recipientEmail = userName;
-    this.myEmmiter.next(userName);
-    this.router.navigate(['chat', userId]);
-    this.newMessages = false;
-    this.newMessagesId = '';
+  updateMessageAsRead(authorMessageId: string, recipientId: string) {
+    this.chatService
+      .updateMessageAsRead(authorMessageId, recipientId)
+      .pipe(take(1))
+      .subscribe({
+        next: (res) => {
+          
+        },
+        error: () => {
+          // console.error('Erro ao obter usuário:', error);
+        },
+      });
   }
 
-  getFirstId(){
-    return this.recipientEmail;
+  goToUser(userId: any, userName: string) {
+    this.recipientName = userName;
+    this.myEmmiter.next(userName);
+    this.updateMessageAsRead(userId, this.user.id);
+
+    // Verifica se userId está presente em newMessagesId
+    if (this.newMessagesId.has(userId)) {
+      // Remove userId do set newMessagesId
+      this.newMessagesId.delete(userId);
+    }
+
+    this.router.navigate(['chat', userId]);
   }
-  
+
+  getFirstId() {
+    return this.recipientName;
+  }
+
   getClickEvent(): Observable<string> {
     return this.myEmmiter.asObservable();
   }
@@ -126,8 +157,15 @@ export class ChatComponent implements OnInit {
       .getUsers()
       .pipe(take(1))
       .subscribe({
-        next: (_users: User[] = []) => {
-          this.users = _users;
+        next: (users: User[] = []) => {
+          this.users = users;
+
+          // Itera sobre todos os usuários
+          this.users.forEach((user: User) => {
+            console.log(user.id);
+            // Chama a função getMessages para cada usuário
+            this.getMessages(user.id, 0, 1);
+          });
         },
         error: () => {
           // console.error('Erro ao obter usuário:', error);

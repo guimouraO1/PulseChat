@@ -33,7 +33,7 @@
         @for (user of users; track $index) {
         <div class="friends-card" (click)="goToUser(user.id, user.name)">
           <p>{{ user.name }}</p>
-          @if (newMessages && newMessagesId === user.id) {
+          @if (newMessages && this.newMessagesId.has(user.id)) {
               <mat-icon matBadge="1" matBadgeSize="small" matBadgeColor="warn" >mail_outline</mat-icon>
           }@else {
             <mat-icon>mail_outline</mat-icon>
