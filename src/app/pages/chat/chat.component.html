@@ -20,7 +20,7 @@
       }
       <div class="user-greeting">
         <span>Welcome back </span>
-        <span class="username">{{ user.name }}</span>
+        <span class="username">{{ user?.name }}</span>
       </div>
 
       @defer (when init) {
@@ -33,7 +33,7 @@
       }
 
       <div class="friends">
-        @for (user of users; track $index) {
+        @for (user of users!; track $index) {
         <div class="friends-card" (click)="goToUser(user.id, user.name)">
           <p>{{ user.name }}</p>
           @if (this.newMessagesId.has(user.id)) {

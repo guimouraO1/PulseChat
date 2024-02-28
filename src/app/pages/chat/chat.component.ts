@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
 import { Observable, firstValueFrom, map, take } from 'rxjs';
@@ -37,11 +37,12 @@ import { MessagesInterface } from '../../models/messages.model';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export class ChatComponent implements OnInit, AfterViewInit {
+export class ChatComponent implements OnInit {
   constructor(
     private userService: UserService,
     private router: Router,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   // Emmit the name of the user you are chatting with.
@@ -50,7 +51,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
   // This user {}.
   protected user: any;
   // Friends array .
-  protected users: User[] = [];
+  users: User[] = [];
   // Init to defer .
   protected init = false;
   // Recipient ID.
@@ -60,7 +61,13 @@ export class ChatComponent implements OnInit, AfterViewInit {
   // If you have the id in the array and newMessages = true matBadge appears in the friend that there will be new messages.
   protected newMessagesId: Set<any> = new Set();
 
+  recipientValue = this.activatedRoute.paramMap.pipe(
+    map((value) => value.get('userId'))
+  );
+
   async ngOnInit() {
+    //
+    this.router.navigate(['chat']);
     // Get your user infos. ex: user.name, user.email, user.id
     await this.getUser();
     // Get friends infos. ex: user.name, user.email, user.id
@@ -94,6 +101,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
         // Call the getMessages function for each user
         await this.getMessages(user.id, 0, 1);
       }
+      this.init = true;
     } catch (error) {
       // Handle the error here
       console.error('Error while fetching users:', error);
@@ -188,10 +196,5 @@ export class ChatComponent implements OnInit, AfterViewInit {
   logout(): void {
     localStorage.removeItem('token');
     this.router.navigate(['login']);
-  }
-
-  // After init load defer
-  ngAfterViewInit(): void {
-    this.init = true;
   }
 }
