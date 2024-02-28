@@ -61,6 +61,8 @@ export class ConversationMessagesComponent implements OnInit {
     this.recipientName = this.chatComponent.getRecipientName();
     // Get your user infos. ex: user.name, user.email, user.id
     await this.getUser();
+    // listen the click on the "chat" page to change the conversation
+    this.listenForRecipientChange();
     // Listens if the recipient has changed.
     this.listenForParameterChange();
     // Listens for new messages from socket.io
@@ -76,6 +78,13 @@ export class ConversationMessagesComponent implements OnInit {
     } catch (e) {
       //
     }
+  }
+
+  // listen the click on the "chat" page to change the conversation
+  listenForRecipientChange(): void {
+    this.chatComponent.getClickEvent().subscribe((userId: string) => {
+      this.recipientName = userId;
+    });
   }
 
   // When logging in, or refreshing the page, it takes the last 11 messages.
@@ -99,6 +108,7 @@ export class ConversationMessagesComponent implements OnInit {
       console.error('Error while fetching messages:', error);
     }
   }
+
   // listen For Parameter Change, when change get 11 last messages and set offset 0.
   listenForParameterChange(): void {
     try {
@@ -149,7 +159,7 @@ export class ConversationMessagesComponent implements OnInit {
     this.inputMessage = '';
     this.messageComps.changes.subscribe(() => this.scrollToLast());
   }
-  
+
   // Infinite scrolling. When the user scrolls to the last top message, the client sends a get request for 11 more messages.
   scrollOnTop(): void {
     if (this.scrollPanel.nativeElement.scrollTop === 0) {
