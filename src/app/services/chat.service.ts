@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { MessagesInterface } from '../models/messages.model';
@@ -12,7 +12,10 @@ export class ChatService {
   private socket: Socket;
   protected user: any;
   private urlApi = `${environment.url}`;
-  
+
+  @Output() newMessageEmmiter = new EventEmitter<boolean>();
+  @Output() newMessageEmmiterId = new EventEmitter<string>();
+
   constructor(private http: HttpClient) {
     this.socket = io('ws://localhost:3000');
   }
@@ -31,7 +34,7 @@ export class ChatService {
       message,
       authorMessageId,
       recipientId,
-      time,
+      time
     });
   }
 

@@ -43,7 +43,8 @@ export class ConversationMessagesComponent implements OnInit {
   recipientId: any;
   recipientEmail = '';
   offset = 0;
-  limit = 11; // Defina o número inicial de mensagens a serem carregadas
+  limit = 11;
+  read = false
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -114,6 +115,8 @@ export class ConversationMessagesComponent implements OnInit {
         message.authorMessageId !== this.recipientId &&
         message.authorMessageId !== this.userId
       ) {
+        this.chatService.newMessageEmmiter.emit(true);
+        this.chatService.newMessageEmmiterId.emit(message.authorMessageId);
         return;
       }
       this.messages.push({
@@ -122,6 +125,7 @@ export class ConversationMessagesComponent implements OnInit {
         time: message.time,
         isMine: message.authorMessageId === this.userId,
         message: message.message,
+        read: message.read
       });
     });
   }

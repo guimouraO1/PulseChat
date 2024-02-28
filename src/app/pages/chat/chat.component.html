@@ -1,13 +1,25 @@
 <main class="main-container">
   <div class="side-nav">
     <div class="side-nav-content">
-      <mat-icon (click)="exitApp()" class="exit-button">exit_to_app</mat-icon>
+      
+      <div class="menu">
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item>
+            <mat-icon>person_add</mat-icon>
+            <span class="span">Add new Friend</span>
+          </button>
+          <button mat-menu-item (click)="exitApp()">
+            <mat-icon class="exit-button">exit_to_app</mat-icon>
+            <span class="span">Logout</span>
+          </button>
+        </mat-menu>
+      </div>
 
       <div class="header">
-        <span
-          >Welcome back
-          <span style="color: darkslateblue">{{ user?.email }} </span>
-        </span>
+        <span>Welcome back <span class="username">{{ user?.name }} </span></span>
       </div>
 
       <div class="search">
@@ -19,9 +31,15 @@
 
       <div class="friends">
         @for (user of users; track $index) {
-        <div class="friends-card" (click)="goToUser(user.id, user.email)">
-          <p>{{ user.email }}</p>
+        <div class="friends-card" (click)="goToUser(user.id, user.name)">
+          <p>{{ user.name }}</p>
+          @if (newMessages && newMessagesId === user.id) {
+              <mat-icon matBadge="1" matBadgeSize="small" matBadgeColor="warn" >mail_outline</mat-icon>
+          }@else {
+            <mat-icon>mail_outline</mat-icon>
+          }
         </div>
+
         } @empty {
         <p>No friends</p>
         }

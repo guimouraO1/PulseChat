@@ -41,6 +41,9 @@
     height: 10%;
     padding: 0px 20px;
     width: 90%;
+    .username{
+      color: colors.$primary;
+    }
   }
 
   input {

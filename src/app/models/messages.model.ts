@@ -3,5 +3,6 @@ export interface MessagesInterface {
     recipientId: string,
     message: string,
     isMine: boolean,
-    time: Date
+    time: Date,
+    read: boolean
 }
