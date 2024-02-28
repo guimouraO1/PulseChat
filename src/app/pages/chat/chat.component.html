@@ -1,6 +1,7 @@
 <main class="main-container">
   <div class="side-nav">
     <div class="side-nav-content">
+      @defer (when init) {
       <div class="menu">
         <button mat-icon-button [matMenuTriggerFor]="menu">
           <mat-icon>menu</mat-icon>
@@ -10,29 +11,32 @@
             <mat-icon>person_add</mat-icon>
             <span class="span">Add new Friend</span>
           </button>
-          <button mat-menu-item (click)="exitApp()">
+          <button mat-menu-item (click)="logout()">
             <mat-icon class="exit-button">exit_to_app</mat-icon>
             <span class="span">Logout</span>
           </button>
         </mat-menu>
       </div>
-
-      <div class="header">
-          <span>Welcome back <span class="username">{{ user.name }} </span></span>
+      }
+      <div class="user-greeting">
+        <span>Welcome back </span>
+        <span class="username">{{ user.name }}</span>
       </div>
 
-        <div class="search">
-          <mat-form-field class="chat-input" appearance="outline">
-            <input matInput placeholder="Search" #searchField />
-            <mat-icon matSuffix>search</mat-icon>
-          </mat-form-field>
-        </div>
+      @defer (when init) {
+      <div class="search">
+        <mat-form-field class="chat-input" appearance="outline">
+          <input matInput placeholder="Search" #searchField />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+      }
 
       <div class="friends">
         @for (user of users; track $index) {
         <div class="friends-card" (click)="goToUser(user.id, user.name)">
           <p>{{ user.name }}</p>
-          @if (newMessages && this.newMessagesId.has(user.id)) {
+          @if (this.newMessagesId.has(user.id)) {
           <div
             matBadge="1"
             matBadgeSize="small"

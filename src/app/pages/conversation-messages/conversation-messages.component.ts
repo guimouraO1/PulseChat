@@ -34,6 +34,7 @@ import { ChatComponent } from '../chat/chat.component';
   ],
 })
 export class ConversationMessagesComponent implements OnInit {
+  
   @ViewChildren(MessagesComponent) messageComps!: QueryList<MessagesComponent>;
   @ViewChild('scrollPanel') scrollPanel!: ElementRef;
 
@@ -41,7 +42,7 @@ export class ConversationMessagesComponent implements OnInit {
   protected inputMessage = '';
   userId: any;
   recipientId: any;
-  recipientEmail = '';
+  recipientName = '';
   offset = 0;
   limit = 11;
   read = false
@@ -55,7 +56,7 @@ export class ConversationMessagesComponent implements OnInit {
 
   ngOnInit(): void {
     // Get the first id after click in the contact
-    this.recipientEmail = this.chatComponent.getFirstId();
+    this.recipientName = this.chatComponent.getRecipientName();
     this.initializeUser();
     this.listenForRecipientChange();
     this.listenForParameterChange();
@@ -95,7 +96,7 @@ export class ConversationMessagesComponent implements OnInit {
 
   listenForRecipientChange(): void {
     this.chatComponent.getClickEvent().subscribe((userId: string) => {
-      this.recipientEmail = userId;
+      this.recipientName = userId;
     });
   }
 
@@ -110,12 +111,11 @@ export class ConversationMessagesComponent implements OnInit {
   }
 
   fetchMessages(): void {
-    this.chatService.getMessages().subscribe((message: any) => {
+    this.chatService.privateMessageListener().subscribe((message: any) => {
       if (
         message.authorMessageId !== this.recipientId &&
         message.authorMessageId !== this.userId
       ) {
-        this.chatService.newMessageEmmiter.emit(true);
         this.chatService.newMessageEmmiterId.emit(message.authorMessageId);
         return;
       }

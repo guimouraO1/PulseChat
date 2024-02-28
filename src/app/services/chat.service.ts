@@ -13,7 +13,6 @@ export class ChatService {
   protected user: any;
   private urlApi = `${environment.url}`;
 
-  @Output() newMessageEmmiter = new EventEmitter<boolean>();
   @Output() newMessageEmmiterId = new EventEmitter<string>();
 
   constructor(private http: HttpClient) {
@@ -63,7 +62,7 @@ export class ChatService {
   }
   
 
-  getMessages(): Observable<MessagesInterface> {
+  privateMessageListener(): Observable<MessagesInterface> {
     return new Observable((observer) => {
       // Escute as mensagens recebidas do servidor
       this.socket.on('private-message', (message: any) => {
