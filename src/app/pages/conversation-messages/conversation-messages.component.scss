@@ -4,10 +4,11 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  height: 100vh;
   justify-content: flex-end;
+  gap: 20px;
+  height: 100%;
   width: 75vw;
+  max-width: 75vw;
 
   .userInfo {
     align-items: center;
@@ -15,7 +16,7 @@
     color: colors.$text-primary;
     display: flex;
     height: 10%;
-    padding: 0px 20px;
+    padding: 40px 40px;
     width: 90%;
     .username {
       color: colors.$primary;
@@ -23,7 +24,7 @@
   }
 
   .chat-messages {
-    height: 70%;
+    max-height: 70vh;
     overflow: auto;
     padding: 0px 20px;
     width: 90%;
