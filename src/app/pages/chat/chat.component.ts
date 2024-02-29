@@ -56,6 +56,7 @@ export class ChatComponent implements OnInit {
   // If you have the id in the array and newMessages = true matBadge appears in the friend that there will be new messages.
   protected newMessagesId: Set<any> = new Set();
 
+  protected hide: boolean = true;
 
   async ngOnInit() {
 
@@ -192,5 +193,9 @@ export class ChatComponent implements OnInit {
     localStorage.removeItem('users');
     localStorage.removeItem('token');
     this.router.navigate(['login']);
+  }
+
+  changeHide(){
+    this.hide = !this.hide;
   }
 }

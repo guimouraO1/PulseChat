@@ -38,13 +38,29 @@ $PulseChat-theme: mat.define-light-theme(
 @include mat.all-component-themes($PulseChat-theme);
 
 /* You can add global styles to this file, and also import other style files */
-
-html {
-  height: 100%;
+html{
+  height: 100vh;
+  width: 100vw;
 }
 body {
+  height: 100vh;
+  width: 100vw;
+  overflow: auto;
   background-color: colors.$background;
   margin: 0;
   font-family: "Fredoka", sans-serif;
   color: colors.$text_primary;
+
+  &::-webkit-scrollbar {
+    width: 7px;
+
+    &-thumb {
+      background-color: colors.$background2;
+      border-radius: 7px;
+    }
+
+    &-track {
+      background-color: transparent;
+    }
+  }
 }

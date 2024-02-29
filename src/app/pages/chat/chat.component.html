@@ -16,15 +16,24 @@
             <span class="span">Logout</span>
           </button>
         </mat-menu>
+        <div class="expandFalse">
+          <button class="expandBtn" (click)="changeHide()" mat-icon-button>
+            @if (hide) {
+              <mat-icon color="primary">expand_more</mat-icon>
+            }@else {
+              <mat-icon color="primary">expand_less</mat-icon>
+            }
+          </button>
+        </div>
       </div>
       }
-      <div class="user-greeting">
+      <div [class.hide]="hide" class="user-greeting">
         <span>Welcome back </span>
         <span class="username">{{ user?.name }}</span>
       </div>
 
       @defer (when init) {
-      <div class="search">
+      <div class="search" [class.hide]="hide">
         <mat-form-field class="chat-input" appearance="outline">
           <input matInput placeholder="Search" #searchField />
           <mat-icon matSuffix>search</mat-icon>
@@ -32,7 +41,7 @@
       </div>
       }
 
-      <div class="friends">
+      <div class="friends" [class.hide]="hide">
         @for (user of users!; track $index) {
         <div class="friends-card" (click)="goToUser(user)">
           <p>{{ user.name }}</p>
@@ -59,5 +68,5 @@
       </div>
     </div>
   </div>
-  <router-outlet />
+  <router-outlet class="chat" />
 </main>
