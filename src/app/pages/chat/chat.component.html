@@ -1,8 +1,8 @@
 <main class="main-container">
-  <div class="side-nav">
-    <div class="side-nav-content">
+  <div class="side-nav" [class.hide]="hide">
+    <div class="side-nav-content" [class.hide]="hide">
       @defer (when init) {
-      <div class="menu">
+      <div class="menu" [class.hide]="hide">
         <button mat-icon-button [matMenuTriggerFor]="menu">
           <mat-icon>menu</mat-icon>
         </button>

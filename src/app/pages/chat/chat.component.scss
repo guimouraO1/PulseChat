@@ -22,6 +22,7 @@
       flex-direction: column;
       width: 100%;
       padding: 20px;
+      
       .menu {
         display: flex;
         flex-direction: row;
@@ -136,10 +137,25 @@
     flex-direction: column;
     .side-nav {
       min-width: 100vw;
+      &.hide {
+        max-height: 70px;
+        padding: 0px;
+        
+      }
       .side-nav-content {
         width: 100%;
         height: 100%;
+        padding: 0px;
+        margin-top: 20px;
+        &.hide {
+          margin-top: 0px;
+        }
         .menu {
+          width: 90%;
+          height: 10vh;
+          display: flex;
+          align-items: center;
+          
           .expandFalse {
             display: flex;
             .expandBtn:hover {
@@ -147,7 +163,7 @@
             }
           }
         }
-        .user-greeting{
+        .user-greeting {
           &.hide {
             display: none;
           }

@@ -5,19 +5,16 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 20px;
-  height: 100%;
+  gap: 10px;
   width: 75vw;
-  max-width: 75vw;
 
   .userInfo {
     align-items: center;
     border-radius: 4px;
     color: colors.$text-primary;
     display: flex;
-    height: 10%;
-    padding: 40px 40px;
-    width: 90%;
+    height: 10vh;
+    width: 80%;
     .username {
       color: colors.$primary;
     }
@@ -52,5 +49,15 @@
       color: colors.$primary;
       cursor: pointer;
     }
+  }
+}
+
+/* Add media query for mobile */
+@media screen and (max-width: 600px) {
+  .chat{
+    gap: 0px;
+    height: 100%;
+    width: 100vw;
+    
   }
 }
