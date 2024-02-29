@@ -34,7 +34,7 @@
 
       <div class="friends">
         @for (user of users!; track $index) {
-        <div class="friends-card" (click)="goToUser(user.id, user.name)">
+        <div class="friends-card" (click)="goToUser(user)">
           <p>{{ user.name }}</p>
           @if (this.newMessagesId.has(user.id)) {
           <div

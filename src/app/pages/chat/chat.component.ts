@@ -159,19 +159,19 @@ export class ChatComponent implements OnInit {
   }
 
   // When click on a friend card it takes you to chat with that user.
-  goToUser(userId: any, userName: string) {
-    this.recipientName = userName;
-    this.emitRecipientName.next(userName);
-    this.updateMessageAsRead(userId, this.user.id);
-    localStorage.setItem('lastRecipientName', userName);
+  goToUser(recipient: any) {
+    this.recipientName = recipient.name;
+    this.emitRecipientName.next(recipient.name);
+    this.updateMessageAsRead(recipient.id, this.user.id);
+    localStorage.setItem('lastRecipientName', recipient.name);
 
     // Checks if userId is present in newMessagesId.
-    if (this.newMessagesId.has(userId)) {
+    if (this.newMessagesId.has(recipient.id)) {
       // Remove userId do set newMessagesId.
-      this.newMessagesId.delete(userId);
+      this.newMessagesId.delete(recipient.id);
     }
 
-    this.router.navigate(['chat', userId]);
+    this.router.navigate(['chat', recipient.id]);
   }
 
   // Get the name of the first click recipient.

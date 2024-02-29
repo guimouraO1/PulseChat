@@ -49,7 +49,7 @@ export class ConversationMessagesComponent implements OnInit {
   protected offset = 0;
   protected limit = 11;
   protected read = false;
-
+  private shouldScrollToLast = true;
   protected recipientValue: Observable<string | null> =
     this.activatedRoute.paramMap.pipe(map((value) => value.get('userId')));
 
@@ -189,18 +189,18 @@ export class ConversationMessagesComponent implements OnInit {
     } catch (error) {}
   }
 
+  // Get the name of the recipient
   usersInfo() {
     const usersList: any = localStorage.getItem('users');
     const lastRecipientId: any = localStorage.getItem('lastRecipientId');
 
     if (usersList !== null) {
-      const users: User[] = JSON.parse(usersList); 
+      const users: User[] = JSON.parse(usersList);
 
       users.forEach((user) => {
         if (user.id === lastRecipientId) {
-          console.log(user.id);
           this.recipientName = user.name;
-          return; 
+          return;
         }
       });
     } else {
