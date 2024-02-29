@@ -12,11 +12,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, RouterOutlet } from '@angular/router';
-import { firstValueFrom, take } from 'rxjs';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { Observable, firstValueFrom, map, take } from 'rxjs';
 import { ChatService } from '../../services/chat.service';
 import { UserService } from '../../services/user.service';
 import { ChatComponent } from '../chat/chat.component';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-conversation-messages',
@@ -43,17 +44,21 @@ export class ConversationMessagesComponent implements OnInit {
   protected messages: MessagesInterface[] = [];
   protected inputMessage: string = '';
   protected user: any;
-  protected recipientId: any;
+  recipientId: any;
   protected recipientName = '';
   protected offset = 0;
   protected limit = 11;
   protected read = false;
 
+  protected recipientValue: Observable<string | null> =
+    this.activatedRoute.paramMap.pipe(map((value) => value.get('userId')));
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private chatService: ChatService,
     private userService: UserService,
-    private chatComponent: ChatComponent
+    private chatComponent: ChatComponent,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -67,6 +72,8 @@ export class ConversationMessagesComponent implements OnInit {
     this.listenForParameterChange();
     // Listens for new messages from socket.io
     this.fetchMessages();
+    // Get the name of the recipient
+    this.usersInfo();
   }
 
   // Get your user infos. ex: user.name, user.email, user.id
@@ -114,6 +121,7 @@ export class ConversationMessagesComponent implements OnInit {
     try {
       this.activatedRoute.paramMap.subscribe((params) => {
         this.recipientId = params.get('userId');
+        localStorage.setItem('lastRecipientId', this.recipientId);
         this.messages = [];
         this.offset = 0;
         this.limit = 11;
@@ -123,6 +131,11 @@ export class ConversationMessagesComponent implements OnInit {
       // Handle error
       console.error('Error while listen for parameter change:', error);
     }
+  }
+
+  returnReci() {
+    this.listenForParameterChange();
+    return this.recipientId;
   }
 
   // Listen to private messages in real time (socket.io).
@@ -175,6 +188,26 @@ export class ConversationMessagesComponent implements OnInit {
         this.scrollPanel.nativeElement.scrollHeight;
     } catch (error) {}
   }
+
+  usersInfo() {
+    const usersList: any = localStorage.getItem('users');
+    const lastRecipientId: any = localStorage.getItem('lastRecipientId');
+
+    if (usersList !== null) {
+      const users: User[] = JSON.parse(usersList); 
+
+      users.forEach((user) => {
+        if (user.id === lastRecipientId) {
+          console.log(user.id);
+          this.recipientName = user.name;
+          return; 
+        }
+      });
+    } else {
+      this.router.navigate(['chat']);
+    }
+  }
+
   // After init scroll to the last message.
   ngAfterViewInit(): void {
     this.messageComps.changes.subscribe(() => this.scrollToLast());

@@ -1,10 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -33,6 +27,7 @@ import { MessagesInterface } from '../../models/messages.model';
     RouterOutlet,
     MatButtonModule,
     MatBadgeModule,
+    
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -42,7 +37,7 @@ export class ChatComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private chatService: ChatService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
   ) {}
 
   // Emmit the name of the user you are chatting with.
@@ -51,7 +46,7 @@ export class ChatComponent implements OnInit {
   // This user {}.
   protected user: any;
   // Friends array .
-  users: User[] = [];
+  protected users: User[] = [];
   // Init to defer .
   protected init = false;
   // Recipient ID.
@@ -61,13 +56,9 @@ export class ChatComponent implements OnInit {
   // If you have the id in the array and newMessages = true matBadge appears in the friend that there will be new messages.
   protected newMessagesId: Set<any> = new Set();
 
-  recipientValue = this.activatedRoute.paramMap.pipe(
-    map((value) => value.get('userId'))
-  );
 
   async ngOnInit() {
-    //
-    this.router.navigate(['chat']);
+
     // Get your user infos. ex: user.name, user.email, user.id
     await this.getUser();
     // Get friends infos. ex: user.name, user.email, user.id
@@ -95,7 +86,7 @@ export class ChatComponent implements OnInit {
       // Get the list of users
       const users = await firstValueFrom(this.userService.getUsers());
       this.users = users;
-
+      localStorage.setItem('users', JSON.stringify(this.users));
       // Iterate over all users
       for (const user of this.users) {
         // Call the getMessages function for each user
@@ -119,7 +110,7 @@ export class ChatComponent implements OnInit {
   }
 
   // Listens for new messages from newMessageEmmiterId. If the array contains the id of a specific friend, it means that there are new messages from that friend.
-  setupMessageListeners() {
+ setupMessageListeners() {
     this.chatService.newMessageEmmiterId.subscribe((newMessageId: string) => {
       this.newMessagesId.add(newMessageId);
     });
@@ -172,6 +163,7 @@ export class ChatComponent implements OnInit {
     this.recipientName = userName;
     this.emitRecipientName.next(userName);
     this.updateMessageAsRead(userId, this.user.id);
+    localStorage.setItem('lastRecipientName', userName);
 
     // Checks if userId is present in newMessagesId.
     if (this.newMessagesId.has(userId)) {
@@ -184,16 +176,20 @@ export class ChatComponent implements OnInit {
 
   // Get the name of the first click recipient.
   getRecipientName() {
-    return this.recipientName;
+    const lastRecipientName: any = localStorage.getItem('lastRecipientName');
+    return lastRecipientName
   }
 
   // Get the recipient's name when it is updated.
   getClickEvent(): Observable<string> {
     return this.emitRecipientName.asObservable();
   }
-
+ 
   // LogOut
   logout(): void {
+    localStorage.removeItem('lastRecipientName');
+    localStorage.removeItem('lastRecipientId');
+    localStorage.removeItem('users');
     localStorage.removeItem('token');
     this.router.navigate(['login']);
   }
