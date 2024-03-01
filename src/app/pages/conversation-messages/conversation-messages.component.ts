@@ -49,7 +49,6 @@ export class ConversationMessagesComponent implements OnInit {
   protected offset = 0;
   protected limit = 11;
   protected read = false;
-  private shouldScrollToLast = true;
   protected recipientValue: Observable<string | null> =
     this.activatedRoute.paramMap.pipe(map((value) => value.get('userId')));
 
@@ -74,6 +73,9 @@ export class ConversationMessagesComponent implements OnInit {
     this.fetchMessages();
     // Get the name of the recipient
     this.usersInfo();
+    
+    this.chatService.connect(this.user);
+
   }
 
   // Get your user infos. ex: user.name, user.email, user.id
@@ -81,7 +83,6 @@ export class ConversationMessagesComponent implements OnInit {
     try {
       const user = await firstValueFrom(this.userService.getUser());
       this.user = user;
-      this.chatService.connect(this.user.id);
     } catch (e) {
       //
     }

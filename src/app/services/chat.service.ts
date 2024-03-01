@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable, Output } from '@angular/core';
+import { EventEmitter, Injectable, OnInit, Output } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { MessagesInterface } from '../models/messages.model';
@@ -8,20 +8,33 @@ import { environment } from '../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class ChatService {
+
+export class ChatService implements OnInit {
+  
   private socket: Socket;
   protected user: any;
   private urlApi = `${environment.url}`;
+  private connected: boolean = false;
 
   @Output() newMessageEmmiterId = new EventEmitter<string>();
   @Output() recipientId = new EventEmitter<string>();
 
   constructor(private http: HttpClient) {
-    this.socket = io('ws://localhost:3000');
+     this.socket = io('ws://localhost:3000');
+  }
+  ngOnInit(): void {
+    this.connected = false;
   }
 
   connect(user: any) {
-    this.socket.emit('connection_user', user);
+    // console.log(user);
+    // console.log(!this.connected)
+    if (!this.connected) {
+      this.socket.emit("userJoin", user);
+      this.connected = true;
+      return;
+    }
+    // console.log("User already logged in");
   }
 
   sendMessage(
@@ -52,16 +65,18 @@ export class ChatService {
     return this.http.get(url, { headers });
   }
 
-  updateMessageAsRead(authorMessageId: string, recipientId: string): Observable<any> {
+  updateMessageAsRead(
+    authorMessageId: string,
+    recipientId: string
+  ): Observable<any> {
     const url = `${this.urlApi}/messages`;
     const data = {
       authorMessageId: authorMessageId,
-      recipientId: recipientId
+      recipientId: recipientId,
     };
-  
+
     return this.http.put(url, data);
   }
-  
 
   privateMessageListener(): Observable<MessagesInterface> {
     return new Observable((observer) => {
@@ -76,4 +91,24 @@ export class ChatService {
       };
     });
   }
+
+  connectedUsersListener(): Observable<MessagesInterface> {
+    return new Observable((observer) => {
+      // Escute as mensagens recebidas do servidor
+      this.socket.on('connectedUsers', (message: any) => {
+        observer.next(message);
+      });
+
+      // Limpe os recursos quando o observador é cancelado
+      return () => {
+        this.socket.disconnect();
+      };
+    });
+  }
+
+  socketdisconnect(){
+    this.connected = false;
+    this.socket.disconnect().connect();
+  }
+
 }

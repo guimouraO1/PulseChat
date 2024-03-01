@@ -50,7 +50,8 @@ body {
   margin: 0;
   font-family: "Fredoka", sans-serif;
   color: colors.$text_primary;
-
+}
+*{
   &::-webkit-scrollbar {
     width: 7px;
 

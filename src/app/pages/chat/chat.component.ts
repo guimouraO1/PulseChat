@@ -27,7 +27,6 @@ import { MessagesInterface } from '../../models/messages.model';
     RouterOutlet,
     MatButtonModule,
     MatBadgeModule,
-    
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -37,8 +36,8 @@ export class ChatComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private chatService: ChatService,
-    private activatedRoute: ActivatedRoute,
-  ) {}
+  ) {
+  }
 
   // Emmit the name of the user you are chatting with.
   @Output() emitRecipientName = new EventEmitter<string>();
@@ -56,10 +55,11 @@ export class ChatComponent implements OnInit {
   // If you have the id in the array and newMessages = true matBadge appears in the friend that there will be new messages.
   protected newMessagesId: Set<any> = new Set();
 
+  protected connectedUsers: any;
+
   protected hide: boolean = true;
 
   async ngOnInit() {
-
     // Get your user infos. ex: user.name, user.email, user.id
     await this.getUser();
     // Get friends infos. ex: user.name, user.email, user.id
@@ -74,8 +74,9 @@ export class ChatComponent implements OnInit {
   async getUser() {
     try {
       const user = await firstValueFrom(this.userService.getUser());
-      this.user = user;
-      this.chatService.connect(this.user);
+        this.user = user;
+        this.chatService.connect(user);
+        this.connectedUsersListener();
     } catch (e) {
       //
     }
@@ -103,15 +104,33 @@ export class ChatComponent implements OnInit {
   // Listen to private messages in real time (socket.io). If there are new ones add newMessageId (newMessageId = author Message ) to the array.
   fetchMessages(): void {
     this.chatService.privateMessageListener().subscribe((message: any) => {
-      if (message.authorMessageId !== this.user.id) {
+      if (message.authorMessageId !== this.user) {
         this.chatService.newMessageEmmiterId.emit(message.authorMessageId);
         return;
       }
     });
   }
 
+  connectedUsersListener() {
+    this.chatService
+      .connectedUsersListener()
+      .subscribe((connectedUsers: any) => {
+        const connectedUsersArray = JSON.parse(connectedUsers);
+        this.connectedUsers = connectedUsersArray;
+      });
+  }
+  
+  isUserConnected(user: User): boolean {
+    if (!this.connectedUsers) {
+      return false;
+    }
+    return this.connectedUsers.some((userConnected: any) => {
+      return userConnected === user.id;
+    });
+  }
+
   // Listens for new messages from newMessageEmmiterId. If the array contains the id of a specific friend, it means that there are new messages from that friend.
- setupMessageListeners() {
+  setupMessageListeners() {
     this.chatService.newMessageEmmiterId.subscribe((newMessageId: string) => {
       this.newMessagesId.add(newMessageId);
     });
@@ -178,24 +197,25 @@ export class ChatComponent implements OnInit {
   // Get the name of the first click recipient.
   getRecipientName() {
     const lastRecipientName: any = localStorage.getItem('lastRecipientName');
-    return lastRecipientName
+    return lastRecipientName;
   }
 
   // Get the recipient's name when it is updated.
   getClickEvent(): Observable<string> {
     return this.emitRecipientName.asObservable();
   }
- 
+
   // LogOut
   logout(): void {
     localStorage.removeItem('lastRecipientName');
     localStorage.removeItem('lastRecipientId');
     localStorage.removeItem('users');
     localStorage.removeItem('token');
+    this.chatService.socketdisconnect();
     this.router.navigate(['login']);
   }
 
-  changeHide(){
+  changeHide() {
     this.hide = !this.hide;
   }
 }

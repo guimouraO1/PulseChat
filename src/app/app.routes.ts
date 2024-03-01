@@ -27,8 +27,7 @@ export const routes: Routes = [
       {
         path: 'chat',
         title: 'PulseChat | Chat',
-        loadComponent: () =>
-          import('./pages/chat/chat.component').then((p) => p.ChatComponent),
+        loadComponent: () => import('./pages/chat/chat.component').then((p) => p.ChatComponent),
           children: [{
             path: ':userId',
             component: ConversationMessagesComponent

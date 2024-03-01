@@ -4,17 +4,21 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: space-between;
   width: 75vw;
+  height: 100vh;
 
   .userInfo {
+    display: flex;
     align-items: center;
+    justify-content: center;
+    text-align: start;
     border-radius: 4px;
     color: colors.$text-primary;
-    display: flex;
-    height: 10vh;
-    width: 80%;
+    width: 90%;
+    margin-top: 9vh;
+    background-color: colors.$background2;
+    padding: 24px;
     .username {
       color: colors.$primary;
     }
@@ -25,7 +29,8 @@
     overflow: auto;
     padding: 0px 20px;
     width: 90%;
-
+    min-height: 70%;
+    
     &::-webkit-scrollbar {
       width: 7px;
 
@@ -55,9 +60,10 @@
 /* Add media query for mobile */
 @media screen and (max-width: 600px) {
   .chat{
-    gap: 0px;
-    height: 100%;
     width: 100vw;
-    
+    height: 90vh;
+    .userInfo{
+      margin: 0;
+    }
   }
 }

@@ -6,7 +6,8 @@
         <button mat-icon-button [matMenuTriggerFor]="menu">
           <mat-icon>menu</mat-icon>
         </button>
-        <mat-menu #menu="matMenu">
+
+        <mat-menu class="menuOpen" #menu="matMenu" panelClass="example-panel">
           <button mat-menu-item>
             <mat-icon>person_add</mat-icon>
             <span class="span">Add new Friend</span>
@@ -19,9 +20,9 @@
         <div class="expandFalse">
           <button class="expandBtn" (click)="changeHide()" mat-icon-button>
             @if (hide) {
-              <mat-icon color="primary">expand_more</mat-icon>
+            <mat-icon color="primary">expand_more</mat-icon>
             }@else {
-              <mat-icon color="primary">expand_less</mat-icon>
+            <mat-icon color="primary">expand_less</mat-icon>
             }
           </button>
         </div>
@@ -42,9 +43,18 @@
       }
 
       <div class="friends" [class.hide]="hide">
-        @for (user of users!; track $index) {
+        @for (user of users; track $index) {
         <div class="friends-card" (click)="goToUser(user)">
-          <p>{{ user.name }}</p>
+          <div class="status">
+            @if (isUserConnected(user)){
+            <!-- <div class="online"></div> -->
+            <mat-icon color="primary"> trip_origin</mat-icon>
+            } @else {
+              <mat-icon color="warn"> trip_origin</mat-icon>
+            <!-- <div class="offline"></div> -->
+            }
+            <p class="userName">{{ user.name }}</p>
+          </div>
           @if (this.newMessagesId.has(user.id)) {
           <div
             matBadge="1"
@@ -55,8 +65,7 @@
             <mat-icon>mail_outline</mat-icon>
           </div>
           }@else {
-          <mat-icon>mail_outline</mat-icon>
-          }
+          <mat-icon>mail_outline</mat-icon> }
         </div>
 
         } @empty {
