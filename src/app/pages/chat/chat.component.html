@@ -50,22 +50,24 @@
             <!-- <div class="online"></div> -->
             <mat-icon color="primary"> trip_origin</mat-icon>
             } @else {
-              <mat-icon color="warn"> trip_origin</mat-icon>
+            <mat-icon color="warn"> trip_origin</mat-icon>
             <!-- <div class="offline"></div> -->
             }
             <p class="userName">{{ user.name }}</p>
           </div>
+
           @if (this.newMessagesId.has(user.id)) {
           <div
-            matBadge="1"
+            matBadge="{{ totalMessageCount }}"
             matBadgeSize="small"
-            matBadgeOverlap="friends-card"
             matBadgeColor="warn"
+            class="messages"
           >
             <mat-icon>mail_outline</mat-icon>
           </div>
-          }@else {
-          <mat-icon>mail_outline</mat-icon> }
+          } @else {
+          <div class="message"><mat-icon>mail_outline</mat-icon></div>
+          }
         </div>
 
         } @empty {
@@ -77,5 +79,5 @@
       </div>
     </div>
   </div>
-  <router-outlet class="chat" />
+  <router-outlet />
 </main>

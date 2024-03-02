@@ -78,7 +78,6 @@
       }
 
       .friends {
-        cursor: pointer;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -86,34 +85,43 @@
         height: 70vh;
         overflow-y: auto;
         overflow-x: hidden;
-        width: 90%;
-
+        
         .friends-card {
-          align-items: center;
-          background-color: colors.$cardBackground;
-          border-radius: 4px;
           display: flex;
           flex-direction: row;
+          align-items: center;
           justify-content: space-between;
-          padding: 4px 20px;
-          width: 80%;
           text-wrap: pretty-block;
+          cursor: pointer;
+          width: 20vw;
+          background-color: colors.$cardBackground;
+          border-radius: 4px;
+          padding: 4px 20px;
+          flex-wrap: wrap;
+
           .status {
             display: flex;
-            flex-direction: row;
             align-items: center;
+            width: 80%;
             gap: 20px;
-            text-wrap: pretty-block;
             .userName {
+              width: 80%;
+              text-wrap: pretty-block;
               color: colors.$text-primary;
               font-family: "Fredoka", sans-serif;
               word-wrap: break-word;
-              max-width: 80%;
             }
             mat-icon{
               transform: scale(0.8);
             }
           }
+          .message{
+          }
+
+        }
+        .friends-card:hover{
+          background-color: colors.$background;
+
         }
       }
     }
@@ -221,7 +229,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: xx-small !important;
+  font-size: 10px !important;
   font-family: "Noto Sans KR", sans-serif;
 }
 

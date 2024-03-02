@@ -9,14 +9,15 @@
 }
 
 .card {
-  width: 30vw;
-  height: 60vh;
+  min-width: 500px;
+  height: 550px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 10px;
   background-color: colors.$background2;
+  border-radius: 10px;
 
   .content {
     height: 100%;

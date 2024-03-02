@@ -22,6 +22,7 @@ export class ChatService implements OnInit {
   constructor(private http: HttpClient) {
      this.socket = io('ws://localhost:3000');
   }
+  
   ngOnInit(): void {
     this.connected = false;
   }
