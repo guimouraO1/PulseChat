@@ -28,11 +28,11 @@ export class UserService {
     return this.http.get<User[]>(`${this.urlApi}/users`, { headers });
   }
 
-  // getFriends(): Observable<Friends[]> {
-  //   const token = localStorage.getItem('token');
-  //   const headers = new HttpHeaders().set('authorization', `${token}`);
+  getFriends(): Observable<Friends[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('authorization', `${token}`);
 
-  //   return this.http.get<Friends[]>(`${this.urlApi}/friends`, { headers });
-  // }
+    return this.http.get<Friends[]>(`${this.urlApi}/friends`, { headers });
+  }
 
 }

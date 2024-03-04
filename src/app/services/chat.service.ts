@@ -14,7 +14,6 @@ export class ChatService {
   private urlApi = `${environment.url}`;
 
   @Output() newMessageEmmiterId = new EventEmitter<string>();
-  @Output() recipientId = new EventEmitter<string>();
 
   constructor(private http: HttpClient) {
   }

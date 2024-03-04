@@ -1,8 +1,10 @@
 import {
   Component,
   ElementRef,
+  EventEmitter,
   OnDestroy,
   OnInit,
+  Output,
   QueryList,
   ViewChild,
   ViewChildren,
@@ -13,7 +15,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Route, Router, RouterOutlet } from '@angular/router';
 import {
   Observable,
   Subject,
@@ -24,8 +26,8 @@ import {
 } from 'rxjs';
 import { ChatService } from '../../services/chat.service';
 import { UserService } from '../../services/user.service';
+import { Friends } from '../../models/friends.model';
 import { ChatComponent } from '../chat/chat.component';
-import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-conversation-messages',
@@ -52,35 +54,29 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
   protected inputMessage: string = '';
   protected user: any;
   recipientId: any;
-  protected recipientName = '';
+  protected recipientName: any;
   protected offset = 0;
   protected limit = 11;
   protected read = false;
-  protected recipientValue: Observable<string | null> =
-    this.activatedRoute.paramMap.pipe(map((value) => value.get('userId')));
+  protected recipientValue: Observable<string | null> = this.activatedRoute.paramMap.pipe(map((value) => value.get('userId')));
   private destroy$ = new Subject<void>();
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private chatService: ChatService,
     private userService: UserService,
-    private chatComponent: ChatComponent,
     private router: Router
   ) {}
 
   async ngOnInit() {
     // Get the first id after click in the contact.
-    this.recipientName = this.chatComponent.getRecipientName();
+    this.recipientName = localStorage.getItem('lastRecipientName');
     // Get your user infos. ex: user.name, user.email, user.id
     await this.getUser();
-    // listen the click on the "chat" page to change the conversation
-    this.listenForRecipientChange();
     // Listens if the recipient has changed.
     this.listenForParameterChange();
     // Listens for new messages from socket.io
     this.fetchMessages();
-    // Get the name of the recipient
-    this.usersInfo();
   }
 
   // Get your user infos. ex: user.name, user.email, user.id
@@ -91,16 +87,6 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
     } catch (e) {
       
     }
-  }
-
-  // listen the click on the "chat" page to change the conversation
-  listenForRecipientChange(): void {
-    this.chatComponent
-      .getClickEvent()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((userId: string) => {
-        this.recipientName = userId;
-      });
   }
 
   // When logging in, or refreshing the page, it takes the last 11 messages.
@@ -128,8 +114,13 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
       this.activatedRoute.paramMap
         .pipe(takeUntil(this.destroy$))
         .subscribe(async (params) => {
-          this.recipientId = params.get('userId');
-          localStorage.setItem('lastRecipientId', this.recipientId);
+          this.recipientName = localStorage.getItem('lastRecipientName');
+          this.recipientId = params.get("userId");
+          // 
+          if(this.recipientId !== localStorage.getItem('lastRecipientId')){
+            this.router.navigate(['']);
+          }
+
           this.messages = [];
           this.offset = 0;
           this.limit = 11;
@@ -138,11 +129,6 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error while listen for parameter change:', error);
     }
-  }
-
-  returnReci() {
-    this.listenForParameterChange();
-    return this.recipientId;
   }
 
   // Listen to private messages in real time (socket.io).
@@ -199,25 +185,6 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
       this.scrollPanel.nativeElement.scrollTop =
         this.scrollPanel.nativeElement.scrollHeight;
     } catch (error) {}
-  }
-
-  // Get the name of the recipient
-  usersInfo() {
-    const usersList: any = localStorage.getItem('users');
-    const lastRecipientId: any = localStorage.getItem('lastRecipientId');
-
-    if (usersList !== null) {
-      const users: User[] = JSON.parse(usersList);
-
-      users.forEach((user) => {
-        if (user.id === lastRecipientId) {
-          this.recipientName = user.name;
-          return;
-        }
-      });
-    } else {
-      this.router.navigate(['chat']);
-    }
   }
 
   // After init scroll to the last message.

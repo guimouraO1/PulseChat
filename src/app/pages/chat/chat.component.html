@@ -45,20 +45,20 @@
       }
 
       <div class="friends" [class.hide]="hide">
-        @for (user of users; track $index) {
-        <div class="friends-card" (click)="goToUser(user)">
+        @for (friend of friends; track $index) {
+        <div class="friends-card" (click)="goToUser(friend)">
           <div class="status">
-            @if (isUserConnected(user)){
+            @if (isFrindConnected(friend)){
             <!-- <div class="online"></div> -->
             <mat-icon color="primary"> trip_origin</mat-icon>
             } @else {
             <mat-icon color="warn"> trip_origin</mat-icon>
             <!-- <div class="offline"></div> -->
             }
-            <p class="userName">{{ user.name }}</p>
+            <p class="userName">{{ friend.friendName }}</p>
           </div>
 
-          @if (this.newMessagesId.has(user.id)) {
+          @if (this.newMessagesId.has(friend.friendId)) {
           <div
             matBadge="{{ totalNewMessageCount }}"
             matBadgeSize="small"

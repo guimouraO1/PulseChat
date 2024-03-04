@@ -21,6 +21,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MessagesInterface } from '../../models/messages.model';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Socket, io } from 'socket.io-client';
+import { Friends } from '../../models/friends.model';
 
 @Component({
   selector: 'app-chat',
@@ -49,33 +50,34 @@ export class ChatComponent implements OnInit, OnDestroy {
     public dialog: MatDialog
   ) {}
 
-  // Emmit the name of the user you are chatting with.
-  @Output() emitRecipientName = new EventEmitter<string>();
-
   // This user {}.
   protected user: any;
   // Friends array .
   protected users: User[] = [];
   // Init to defer .
   protected init = false;
-  // Recipient ID.
-  protected recipientId: string = '';
   // Recipient Name.
   protected recipientName: string = '';
   // If you have the id in the array and newMessages = true matBadge appears in the friend that there will be new messages.
   protected newMessagesId: Set<any> = new Set();
-  private socket!: Socket;
+  
+  protected friends: Friends[] = [];
 
   protected totalNewMessageCount: number = 1;
+  
   protected connectedUsers: any;
+  
   protected hide: boolean = true;
+  
   private destroy$ = new Subject<void>();
 
   async ngOnInit() {
     // Get your user infos. ex: user.name, user.email, user.id
     await this.getUser();
-    // Get friends infos. ex: user.name, user.email, user.id
-    await this.getUsers();
+    // Get user by ''''''. ex: user.name, user.email, user.id
+    // await this.getUsers();
+    // Get all friends. ex: user.name, user.email, user.id
+    await this.getFriends();
     // Listens for new messages from socket.io
     this.fetchMessages();
     // Listens for new messages from newMessageEmmiter and newMessageEmmiterId.
@@ -95,7 +97,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Get friends infos. ex: user.name, user.email, user.id
+  // Get user to add. ex: user.name, user.email, user.id
   async getUsers() {
     try {
       // Get the list of users
@@ -111,6 +113,23 @@ export class ChatComponent implements OnInit, OnDestroy {
     } catch (error) {
       // Handle the error here
       console.error('Error while fetching users:', error);
+    }
+  }
+
+  async getFriends() {
+    try {
+      // Get the list of users
+      const friends = await firstValueFrom(this.userService.getFriends());
+      localStorage.setItem('Friends', JSON.stringify(friends));
+      this.friends = friends;
+      // Iterate over all users
+      for (const friend of friends) {
+        // Call the getMessages function for each user
+        await this.getMessages(friend.friendId, 0, 1);
+      }
+      this.init = true;
+    } catch (error) {
+      console.error('Error while fetching friends:', error);
     }
   }
 
@@ -137,12 +156,12 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
-  isUserConnected(user: User): boolean {
+  isFrindConnected(friend: Friends): boolean {
     if (!this.connectedUsers) {
       return false;
     }
     return this.connectedUsers.some((userConnected: any) => {
-      return userConnected === user.id;
+      return userConnected === friend.friendId;
     });
   }
 
@@ -198,30 +217,18 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   // When click on a friend card it takes you to chat with that user.
-  goToUser(recipient: any) {
-    this.recipientName = recipient.name;
-    this.emitRecipientName.next(recipient.name);
-    this.updateMessageAsRead(recipient.id, this.user.id);
-    localStorage.setItem('lastRecipientName', recipient.name);
-
+  goToUser(recipient: Friends) {
+    this.recipientName = recipient.friendName;
+    this.updateMessageAsRead(recipient.friendId, this.user.id);
+    localStorage.setItem('lastRecipientId', recipient.friendId);
+    localStorage.setItem('lastRecipientName', recipient.friendName);
     // Checks if userId is present in newMessagesId.
-    if (this.newMessagesId.has(recipient.id)) {
+    if (this.newMessagesId.has(recipient.friendId)) {
       // Remove userId do set newMessagesId.
-      this.newMessagesId.delete(recipient.id);
+      this.newMessagesId.delete(recipient.friendId);
     }
 
-    this.router.navigate(['chat', recipient.id]);
-  }
-
-  // Get the name of the first click recipient.
-  getRecipientName() {
-    const lastRecipientName: any = localStorage.getItem('lastRecipientName');
-    return lastRecipientName;
-  }
-
-  // Get the recipient's name when it is updated.
-  getClickEvent(): Observable<string> {
-    return this.emitRecipientName.asObservable();
+    this.router.navigate(['chat', recipient.friendId]);
   }
 
   // LogOut

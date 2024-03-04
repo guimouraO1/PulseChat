@@ -20,7 +20,6 @@ export class AuthService {
   ) {}
 
   async login(loginForm: {}) {
-    console.log(true);
     this.disableButton.next(true);
     try {
       const res: any = await lastValueFrom(this.http.post(`${this.urlApi}/login`, loginForm).pipe(take(1)));
