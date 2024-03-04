@@ -234,6 +234,10 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.router.navigate(['login']);
   }
 
+  goToProfile(){
+    this.router.navigate(['profile']);
+  }
+
   changeHide() {
     this.hide = !this.hide;
   }

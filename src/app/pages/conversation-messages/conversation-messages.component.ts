@@ -89,7 +89,7 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
       const user = await firstValueFrom(this.userService.getUser());
       this.user = user;
     } catch (e) {
-      //
+      
     }
   }
 

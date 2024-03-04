@@ -33,6 +33,11 @@ export const routes: Routes = [
             component: ConversationMessagesComponent
           }]
       },
+      {
+        path: 'profile',
+        title: 'PulseChat | Profile',
+        loadComponent: () => import('./pages/profile/profile.component').then((p) => p.ProfileComponent)
+      },
     ],
   },
   {

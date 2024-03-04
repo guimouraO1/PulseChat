@@ -3,17 +3,17 @@
     <div class="side-nav-content" [class.hide]="hide">
       @defer (when init) {
       <div class="menu" [class.hide]="hide">
+        
         <button mat-icon-button [matMenuTriggerFor]="menu">
           <mat-icon>menu</mat-icon>
         </button>
 
         <mat-menu class="menuOpen" #menu="matMenu" panelClass="example-panel">
-          <button mat-menu-item>
-            <mat-icon>person_add</mat-icon>
-            <span class="span">Add new Friend</span>
+          <button (click)="goToProfile()" class="menu-item" mat-menu-item>
+            <mat-icon>person</mat-icon>
+            <span class="span">Profile</span>
           </button>
-
-          <button mat-menu-item (click)="logout()">
+          <button class="menu-item" mat-menu-item (click)="logout()">
             <mat-icon class="exit-button">exit_to_app</mat-icon>
             <span class="span">Logout</span>
           </button>

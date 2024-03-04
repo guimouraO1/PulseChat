@@ -29,6 +29,7 @@
         justify-content: space-between;
         // justify-content: flex-start;
         width: 100%;
+
         .expandFalse {
           display: none;
           .expandBtn:hover {
@@ -115,8 +116,7 @@
               transform: scale(0.8);
             }
           }
-          .message{
-          }
+
 
         }
         .friends-card:hover{
@@ -234,6 +234,8 @@
 }
 
 ::ng-deep .menuOpen {
+  width: 200px !important;
+
   background: colors.$background2 !important;
   .span {
     color: colors.$text-primary !important;
