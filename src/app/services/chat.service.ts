@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable, OnInit, Output } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { MessagesInterface } from '../models/messages.model';
@@ -8,34 +8,25 @@ import { environment } from '../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-
-export class ChatService implements OnInit {
-  
-  private socket: Socket;
+export class ChatService {
+  private socket!: Socket;
   protected user: any;
   private urlApi = `${environment.url}`;
-  private connected: boolean = false;
 
   @Output() newMessageEmmiterId = new EventEmitter<string>();
   @Output() recipientId = new EventEmitter<string>();
 
   constructor(private http: HttpClient) {
-     this.socket = io('ws://localhost:3000');
-  }
-  
-  ngOnInit(): void {
-    this.connected = false;
   }
 
   connect(user: any) {
-    // console.log(user);
-    // console.log(!this.connected)
-    if (!this.connected) {
-      this.socket.emit("userJoin", user);
-      this.connected = true;
-      return;
+    try {
+      this.socket = io('ws://localhost:3000', {
+        query: { user: JSON.stringify(user) },
+      });
+    } catch (error) {
+      console.log('Cannot connect to websocket');
     }
-    // console.log("User already logged in");
   }
 
   sendMessage(
@@ -71,10 +62,7 @@ export class ChatService implements OnInit {
     recipientId: string
   ): Observable<any> {
     const url = `${this.urlApi}/messages`;
-    const data = {
-      authorMessageId: authorMessageId,
-      recipientId: recipientId,
-    };
+    const data = { authorMessageId: authorMessageId, recipientId: recipientId };
 
     return this.http.put(url, data);
   }
@@ -107,9 +95,7 @@ export class ChatService implements OnInit {
     });
   }
 
-  socketdisconnect(){
-    this.connected = false;
+  socketdisconnect() {
     this.socket.disconnect().connect();
   }
-
 }

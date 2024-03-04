@@ -13,6 +13,7 @@ import {
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -31,13 +32,19 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
+  disableButton: boolean = false;
+  listenDisableButton!: Subscription;
+  hide = true;
 
   constructor(
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar,
-    private _authService: AuthService,
-    private _router: Router
-  ) {}
+    private snackBar: MatSnackBar,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    
+    this.listenDisableButton = this.authService.getEventEmitter().subscribe((value) => this.disableButton = value);
+    }
 
   async ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -47,12 +54,13 @@ export class LoginComponent implements OnInit {
 
     await this.isLogged();
   }
-  login(): void {
-    this._authService.login(this.loginForm.value);
+
+  async login() {
+    await this.authService.login(this.loginForm.value);
   }
 
   openSnackBar(): void {
-    this._snackBar.open('Complete all the fields correctly.', 'I understood!', {
+    this.snackBar.open('Complete all the fields correctly.', 'I understood!', {
       horizontalPosition: 'center',
       verticalPosition: 'top',
       duration: 8000,
@@ -62,18 +70,17 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.login();
-    } else {
-      // this.openSnackBar();
     }
+    return;
   }
 
   async isLogged() {
-    let result = await this._authService.asycUserAuthentication();
+    let result = await this.authService.asycUserAuthentication();
 
     if (result) {
-      this._router.navigate(['chat']);
+      this.router.navigate(['chat']);
     } else {
-      this._router.navigate(['login']);
+      this.router.navigate(['login']);
     }
   }
 }

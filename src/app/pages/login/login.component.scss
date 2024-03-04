@@ -51,10 +51,11 @@
       border-color: colors.$primary !important;
     }
 
-    button {
+    .button {
       width: 40%;
       color: colors.$text-primary;
     }
+    
     /* Substitue a cor do texto mat-label*/
     mat-label {
       color: colors.$text-primary;

@@ -6,16 +6,19 @@
           <mat-form-field appearance="outline">
             <mat-label>Email</mat-label>
             <input matInput formControlName="email" />
-            <mat-icon matSuffix>person</mat-icon>
+            <mat-icon color="primary" matSuffix>person</mat-icon>
           </mat-form-field>
         
           <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" />
-            <mat-icon matSuffix>password</mat-icon>
+            <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" >
+            <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-pressed]="hide">
+              <mat-icon color="primary" >{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+
           </mat-form-field>
         
-          <button type="submit" color="primary" mat-stroked-button>Login</button>
+          <button class="button" [disabled]="disableButton" type="submit" color="primary" mat-stroked-button>Login</button>
         </form>
       </div>
   </main>

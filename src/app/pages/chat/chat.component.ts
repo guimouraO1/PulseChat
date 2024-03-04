@@ -1,11 +1,17 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
-import { Observable, firstValueFrom, map, take } from 'rxjs';
-import { CommonModule } from '@angular/common';
+import { Observable, Subject, firstValueFrom, take, takeUntil } from 'rxjs';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { MessagesComponent } from '../../components/messages/messages.component';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../services/chat.service';
@@ -13,6 +19,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MessagesInterface } from '../../models/messages.model';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Socket, io } from 'socket.io-client';
 
 @Component({
   selector: 'app-chat',
@@ -27,17 +35,19 @@ import { MessagesInterface } from '../../models/messages.model';
     RouterOutlet,
     MatButtonModule,
     MatBadgeModule,
+    AsyncPipe,
+    MatDialogModule,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
   constructor(
     private userService: UserService,
     private router: Router,
     private chatService: ChatService,
-  ) {
-  }
+    public dialog: MatDialog
+  ) {}
 
   // Emmit the name of the user you are chatting with.
   @Output() emitRecipientName = new EventEmitter<string>();
@@ -54,12 +64,12 @@ export class ChatComponent implements OnInit {
   protected recipientName: string = '';
   // If you have the id in the array and newMessages = true matBadge appears in the friend that there will be new messages.
   protected newMessagesId: Set<any> = new Set();
+  private socket!: Socket;
 
-  protected totalMessageCount: number = 1;
-
+  protected totalNewMessageCount: number = 1;
   protected connectedUsers: any;
-
   protected hide: boolean = true;
+  private destroy$ = new Subject<void>();
 
   async ngOnInit() {
     // Get your user infos. ex: user.name, user.email, user.id
@@ -76,9 +86,10 @@ export class ChatComponent implements OnInit {
   async getUser() {
     try {
       const user = await firstValueFrom(this.userService.getUser());
-        this.user = user;
-        this.chatService.connect(user);
-        this.connectedUsersListener();
+      this.user = user;
+      // Connection to websocket
+      this.chatService.connect(user);
+      this.connectedUsersListener();
     } catch (e) {
       //
     }
@@ -105,23 +116,27 @@ export class ChatComponent implements OnInit {
 
   // Listen to private messages in real time (socket.io). If there are new ones add newMessageId (newMessageId = author Message ) to the array.
   fetchMessages(): void {
-    this.chatService.privateMessageListener().subscribe((message: any) => {
-      if (message.authorMessageId !== this.user) {
-        this.chatService.newMessageEmmiterId.emit(message.authorMessageId);
-        return;
-      }
-    });
+    this.chatService
+      .privateMessageListener()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message: any) => {
+        if (message.authorMessageId !== this.user) {
+          this.chatService.newMessageEmmiterId.emit(message.authorMessageId);
+          return;
+        }
+      });
   }
 
   connectedUsersListener() {
     this.chatService
       .connectedUsersListener()
+      .pipe(takeUntil(this.destroy$))
       .subscribe((connectedUsers: any) => {
         const connectedUsersArray = JSON.parse(connectedUsers);
         this.connectedUsers = connectedUsersArray;
       });
   }
-  
+
   isUserConnected(user: User): boolean {
     if (!this.connectedUsers) {
       return false;
@@ -133,9 +148,11 @@ export class ChatComponent implements OnInit {
 
   // Listens for new messages from newMessageEmmiterId. If the array contains the id of a specific friend, it means that there are new messages from that friend.
   setupMessageListeners() {
-    this.chatService.newMessageEmmiterId.subscribe((newMessageId: string) => {
-      this.newMessagesId.add(newMessageId);
-    });
+    this.chatService.newMessageEmmiterId
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((newMessageId: string) => {
+        this.newMessagesId.add(newMessageId);
+      });
   }
 
   // When logging in, or refreshing the page, it takes the last message, if it has message.read = false means there is a new message that has not been read.
@@ -219,5 +236,10 @@ export class ChatComponent implements OnInit {
 
   changeHide() {
     this.hide = !this.hide;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

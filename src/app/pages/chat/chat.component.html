@@ -12,11 +12,13 @@
             <mat-icon>person_add</mat-icon>
             <span class="span">Add new Friend</span>
           </button>
+
           <button mat-menu-item (click)="logout()">
             <mat-icon class="exit-button">exit_to_app</mat-icon>
             <span class="span">Logout</span>
           </button>
         </mat-menu>
+        
         <div class="expandFalse">
           <button class="expandBtn" (click)="changeHide()" mat-icon-button>
             @if (hide) {
@@ -58,7 +60,7 @@
 
           @if (this.newMessagesId.has(user.id)) {
           <div
-            matBadge="{{ totalMessageCount }}"
+            matBadge="{{ totalNewMessageCount }}"
             matBadgeSize="small"
             matBadgeColor="warn"
             class="messages"
