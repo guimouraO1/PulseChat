@@ -70,6 +70,10 @@
         flex-direction: row;
         justify-content: space-evenly;
         width: 90%;
+
+        .searchIcon{
+          cursor: pointer;
+        }
         mat-form-field {
           width: 90%;
         }

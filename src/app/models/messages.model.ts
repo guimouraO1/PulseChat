@@ -5,5 +5,6 @@ export interface MessagesInterface {
     message: string,
     isMine: boolean,
     time: Date,
-    read: string
+    read: string,
+    newMessagesLength?: number
 }

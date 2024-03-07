@@ -1,21 +1,36 @@
-import { EventEmitter, Injectable, Output } from '@angular/core';
+import { EventEmitter, Injectable, OnInit, Output } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, takeUntil } from 'rxjs';
 import { MessagesInterface } from '../models/messages.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../environments/environment';
+import { Friends } from '../models/friends.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatService {
-  private socket!: Socket;
-  protected user: any;
-  private urlApi = `${environment.url}`;
 
   @Output() newMessageEmmiterId = new EventEmitter<string>();
+  private socket!: Socket;
+  private urlApi = `${environment.url}`;
+  private recipient$ = new BehaviorSubject({
+    id: '',
+    name: ''
+  });
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient) {}
+
+  returnRecipient$() {
+    return this.recipient$.asObservable();
+  }
+
+  addNewRecipient(recipient: any) {
+    this.recipient$.next({
+      id: recipient.id,
+      name: recipient.name
+    });
   }
 
   connect(user: any) {
@@ -43,16 +58,15 @@ export class ChatService {
   }
 
   getMessagesDb(
-    recipientId: any,
+    recipient: Friends,
     offset: number,
     limit: number
   ): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${token}`);
-
     // Adicione o recipientId, offset e limit como parâmetros na URL
-    const url = `${this.urlApi}/messages?recipientId=${recipientId}&offset=${offset}&limit=${limit}`;
-
+    const url = `${this.urlApi}/messages?recipientId=${recipient.id}&offset=${offset}&limit=${limit}`;
+   
     return this.http.get(url, { headers });
   }
 

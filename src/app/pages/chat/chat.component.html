@@ -1,7 +1,6 @@
 <main class="main-container">
   <div class="side-nav" [class.hide]="hide">
     <div class="side-nav-content" [class.hide]="hide">
-      @defer (when init) {
       <div class="menu" [class.hide]="hide">
         
         <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -29,23 +28,21 @@
           </button>
         </div>
       </div>
-      }
+
       <div [class.hide]="hide" class="user-greeting">
         <span>Welcome back </span>
         <span class="username">{{ user?.name }}</span>
       </div>
 
-      @defer (when init) {
       <div class="search" [class.hide]="hide">
         <mat-form-field class="chat-input" appearance="outline">
-          <input matInput placeholder="Search" #searchField />
-          <mat-icon matSuffix>search</mat-icon>
+          <input matInput [(ngModel)]="searchFriend" (change)="searchFriendFunc()" placeholder="Search" #searchField />
+          <mat-icon class="searchIcon" matSuffix (click)="searchFriendFunc()">search</mat-icon>
         </mat-form-field>
       </div>
-      }
 
       <div class="friends" [class.hide]="hide">
-        @for (friend of friends; track $index) {
+        @for (friend of filteredFriend; track $index) {
         <div class="friends-card" (click)="goToUser(friend)">
           <div class="status">
             @if (isFrindConnected(friend)){
@@ -55,27 +52,39 @@
             <mat-icon color="warn"> trip_origin</mat-icon>
             <!-- <div class="offline"></div> -->
             }
-            <p class="userName">{{ friend.friendName }}</p>
+            <p class="userName">{{ friend.name }}</p>
           </div>
 
-          @if (this.newMessagesId.has(friend.friendId)) {
-          <div
-            matBadge="{{ totalNewMessageCount }}"
-            matBadgeSize="small"
-            matBadgeColor="warn"
-            class="messages"
-          >
-            <mat-icon>mail_outline</mat-icon>
-          </div>
+          @if (this.newMessages.has(friend.id) && this.newMessages.get(friend.id) > 0) {
+            @if (this.newMessages.get(friend.id) > 9) {
+              <div
+              matBadge="9+"
+              matBadgeSize="small"
+              matBadgeColor="warn"
+              class="messages">
+              <mat-icon>mail_outline</mat-icon>
+            </div>
+            } @else {
+              <div
+              matBadge="{{ this.newMessages.get(friend.id) }}"
+              matBadgeSize="small"
+              matBadgeColor="warn"
+              class="messages"> <mat-icon>mail_outline</mat-icon>
+            </div>
+            }
+
           } @else {
           <div class="message"><mat-icon>mail_outline</mat-icon></div>
           }
         </div>
 
         } @empty {
+          <div class="friends-card">
+            <p>No friends found</p>
+          </div>
         <div class="friends-card">
-          <p>No Friends</p>
-          <mat-icon>mail_outline</mat-icon>
+          <p>Add a new one?</p>
+          <mat-icon>person_add</mat-icon>
         </div>
         }
       </div>

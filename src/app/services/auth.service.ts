@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { environment } from '../environments/environment';
 import { Subject, lastValueFrom, take } from 'rxjs';
+import { UserService } from './user.service';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -12,12 +14,14 @@ export class AuthService {
   _isAuthenticated: boolean = false;
   private urlApi = `${environment.url}`;
   private disableButton = new Subject<boolean>();
+  private user!: any;
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private snackBar: MatSnackBar
-  ) {}
+    private snackBar: MatSnackBar) {
+
+    }
 
   async login(loginForm: {}) {
     this.disableButton.next(true);
@@ -38,20 +42,23 @@ export class AuthService {
     const authToken = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${authToken}`);
     try {
-      await lastValueFrom(
-        this.http.get(`${this.urlApi}/user/auth`, { headers }).pipe(take(1))
-      );
+      const user = await lastValueFrom(this.http.get(`${this.urlApi}/user/auth`, { headers }).pipe(take(1)));
+      this.user = user;
       this._isAuthenticated = true;
-      return true;
+      return true
     } catch (e) {
       this._isAuthenticated = false;
-      return false;
+      return false
     }
   }
 
   async _isAuthUser(): Promise<boolean> {
     await this.asycUserAuthentication();
     return this._isAuthenticated;
+  }
+
+  getUser(){
+    return this.user;
   }
 
   openSnackBar(message: string, action: string) {

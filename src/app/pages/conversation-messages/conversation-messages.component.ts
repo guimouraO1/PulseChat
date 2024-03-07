@@ -1,10 +1,8 @@
 import {
   Component,
   ElementRef,
-  EventEmitter,
   OnDestroy,
   OnInit,
-  Output,
   QueryList,
   ViewChild,
   ViewChildren,
@@ -15,19 +13,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, Route, Router, RouterOutlet } from '@angular/router';
-import {
-  Observable,
-  Subject,
-  firstValueFrom,
-  map,
-  take,
-  takeUntil,
-} from 'rxjs';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { ChatService } from '../../services/chat.service';
 import { UserService } from '../../services/user.service';
 import { Friends } from '../../models/friends.model';
-import { ChatComponent } from '../chat/chat.component';
 
 @Component({
   selector: 'app-conversation-messages',
@@ -53,51 +43,62 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
   protected messages: MessagesInterface[] = [];
   protected inputMessage: string = '';
   protected user: any;
-  recipientId: any;
-  protected recipientName: any;
   protected offset = 0;
   protected limit = 11;
   protected read = false;
-  protected recipientValue: Observable<string | null> = this.activatedRoute.paramMap.pipe(map((value) => value.get('userId')));
   private destroy$ = new Subject<void>();
+  protected recipient: any;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private chatService: ChatService,
     private userService: UserService,
     private router: Router
-  ) {}
+  ) {
+    this.subscribeToUserChanges();
+    this.subscribeToRecipientChanges();
+  }
+
+  private subscribeToUserChanges(): void {
+    this.userService
+      .User$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user) => (this.user = user));
+  }
+
+  private subscribeToRecipientChanges(): void {
+    this.chatService
+      .returnRecipient$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((recipient) => {
+        if (recipient) {
+          this.recipient = recipient;
+        }
+        if (this.recipient.name === '') {
+          this.recipient.name = localStorage.getItem('lastFriend');
+        }
+      });
+  }
 
   async ngOnInit() {
-    // Get the first id after click in the contact.
-    this.recipientName = localStorage.getItem('lastRecipientName');
-    // Get your user infos. ex: user.name, user.email, user.id
-    await this.getUser();
-    // Listens if the recipient has changed.
+    // get the old messages from DB
+    await this.getMessages(this.recipient, this.offset, this.limit);
+    // Listens for new parameter change to change receiver.
     this.listenForParameterChange();
     // Listens for new messages from socket.io
     this.fetchMessages();
   }
 
-  // Get your user infos. ex: user.name, user.email, user.id
-  async getUser() {
-    try {
-      const user = await firstValueFrom(this.userService.getUser());
-      this.user = user;
-    } catch (e) {
-      
-    }
-  }
-
   // When logging in, or refreshing the page, it takes the last 11 messages.
   async getMessages(
-    recipientId: string,
+    recipient: Friends,
     offset: number,
     limit: number
   ): Promise<void> {
     try {
-      const messages = await firstValueFrom(this.chatService.getMessagesDb(recipientId, offset, limit));
-      console.log(messages);
+      const messages = await firstValueFrom(
+        this.chatService.getMessagesDb(recipient, offset, limit)
+      );
       const newMessages = messages.map((message: MessagesInterface) => ({
         ...message,
         isMine: message.authorMessageId === this.user.id,
@@ -114,17 +115,13 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
       this.activatedRoute.paramMap
         .pipe(takeUntil(this.destroy$))
         .subscribe(async (params) => {
-          this.recipientName = localStorage.getItem('lastRecipientName');
-          this.recipientId = params.get("userId");
-          // 
-          if(this.recipientId !== localStorage.getItem('lastRecipientId')){
-            this.router.navigate(['']);
+          if (!this.recipient.id) {
+            this.recipient.id = params.get('userId');
           }
-
           this.messages = [];
           this.offset = 0;
           this.limit = 11;
-          await this.getMessages(this.recipientId, this.offset, this.limit);
+          await this.getMessages(this.recipient, this.offset, this.limit);
         });
     } catch (error) {
       console.error('Error while listen for parameter change:', error);
@@ -138,10 +135,9 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((message: any) => {
         if (
-          message.authorMessageId !== this.recipientId &&
+          message.authorMessageId !== this.recipient.id &&
           message.authorMessageId !== this.user.id
         ) {
-          this.chatService.newMessageEmmiterId.emit(message.authorMessageId);
           return;
         }
         this.messages.push({
@@ -162,7 +158,7 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
     this.chatService.sendMessage(
       this.inputMessage, // message
       this.user.id, // authorMessageId
-      this.recipientId, // recipientId
+      this.recipient.id, // recipientId
       new Date() // time
     );
     this.inputMessage = '';
@@ -175,7 +171,7 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
   scrollOnTop(): void {
     if (this.scrollPanel.nativeElement.scrollTop === 0) {
       this.offset += this.limit;
-      this.getMessages(this.recipientId, this.offset, this.limit);
+      this.getMessages(this.recipient, this.offset, this.limit);
     }
   }
 
@@ -197,5 +193,11 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  noParameter() {
+    if (this.recipient.id === '') {
+      this.router.navigate(['chat']);
+    }
   }
 }
