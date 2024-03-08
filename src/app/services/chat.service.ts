@@ -1,11 +1,11 @@
-import { EventEmitter, Injectable, OnInit, Output } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { BehaviorSubject, Observable, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { MessagesInterface } from '../models/messages.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../environments/environment';
 import { Friends } from '../models/friends.model';
-import { ActivatedRoute } from '@angular/router';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -23,14 +23,21 @@ export class ChatService {
 
   constructor(private http: HttpClient) {}
 
+  getFriendById(user: any): Observable<User[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('authorization', `${token}`);
+
+    return this.http.get<User[]>(`${this.urlApi}/user/${user.id}`, { headers });
+  }
+
   returnRecipient$() {
     return this.recipient$.asObservable();
   }
 
-  addNewRecipient(recipient: any) {
+  addNewRecipient(recipientId: string, recipientName: string) {
     this.recipient$.next({
-      id: recipient.id,
-      name: recipient.name
+      id: recipientId,
+      name: recipientName
     });
   }
 
@@ -68,7 +75,6 @@ export class ChatService {
   deleteFriendshipRequest(authorMessageId: string, recipientId: string, name: string, idFriendship: string) {
     this.socket.emit('deleteFriendshipRequest', { authorMessageId, recipientId, name, idFriendship });
   }
-
 
   getMessagesDb(
     recipient: Friends,

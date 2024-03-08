@@ -11,6 +11,8 @@ import { Friends } from '../models/friends.model';
 })
 export class FriendsService {
   private urlApi = `${environment.url}`;
+  private friendListSubject: BehaviorSubject<Friends[]> = new BehaviorSubject<Friends[]>([]);
+  // public friendList$: Observable<Friends[]> = this.friendListSubject.asObservable();
 
   constructor(public authService: AuthService, private http: HttpClient) {}
 
@@ -19,6 +21,14 @@ export class FriendsService {
     const headers = new HttpHeaders().set('authorization', `${token}`);
 
     return this.http.get<Friends[]>(`${this.urlApi}/friends`, { headers });
+  }
+
+  returnFriendList() {
+    return this.friendListSubject.asObservable();
+  }
+
+  updateFriendList(friendList: Friends[]) {
+    this.friendListSubject.next(friendList);
   }
 
   searchUser(username: string): Observable<Friends[]> {

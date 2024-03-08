@@ -83,6 +83,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.acceptedFriendsListener();
 
     this.deleteFriendshipRequestListener();
+
   }
 
   private subscribeToUserChanges(): void {
@@ -96,7 +97,9 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chatService
       .returnRecipient$()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((recipient) => (this.recipient = recipient));
+      .subscribe((recipient) => {
+        this.recipient = recipient;
+      });
   }
 
   async connectUser() {
@@ -121,26 +124,23 @@ export class ChatComponent implements OnInit, OnDestroy {
   async getFriends() {
     try {
       const friends: Friends[] = await firstValueFrom(this.friendsService.getFriends());
-      
       this.friendListRequestSent = friends.filter(friend => friend.senderID === this.user.id && friend.status === 'Pending');
       this.friendListRequestReceived = friends.filter(friend => friend.senderID !== this.user.id && friend.status === 'Pending');
       this.friendList = friends.filter(friend => friend.status === 'Accepted');
-
+      
       await Promise.all(this.friendList.map(async friend => {
         await this.getMessages(friend, 0, 10);
       }));
-  
-      // console.log('Enviados', this.friendListRequestSent);
-      // console.log('Recebidos', this.friendListRequestReceived);
-      // console.log('Amigos', this.friendList);
-  
+         
       this.filteredFriendList = this.friendList;
-  
+
+      // Atualize a lista de amigos usando o serviço
+      this.friendsService.updateFriendList(this.friendList);
     } catch (error) {
       console.error('Error while fetching friends:', error);
     }
   }
-  
+
   // When logging in, or refreshing the page, it takes the last message, if it has message.read = false means there is a new message that has not been read.
   async getMessages(
     recipient: Friends,
@@ -243,9 +243,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   goToUser(recipient: Friends) {
     try {
       this.updateMessageAsRead(recipient.id, this.user.id);
-      localStorage.setItem('lastFriend', recipient.name);
+
     } catch (error) {}
-      this.chatService.addNewRecipient(recipient);
+      this.chatService.addNewRecipient(recipient.id, recipient.name);
     // Checks if userId is present in newMessagesId.
     if (this.newMessages.has(recipient.id)) {
       // Remove userId do set newMessagesId.
@@ -290,8 +290,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.searchInput = '';
     this.friendListRequestSent.push(user);
     this.searchUserInfo = '';
-
-
+    this.filteredFriendList = this.friendList;
   }
 
   async refuseFriendshipReceived(friend: any) {

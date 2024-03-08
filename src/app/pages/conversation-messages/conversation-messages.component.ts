@@ -14,10 +14,12 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
-import { Subject, firstValueFrom, takeUntil } from 'rxjs';
+import { Subject, Subscription, firstValueFrom, takeUntil } from 'rxjs';
 import { ChatService } from '../../services/chat.service';
 import { UserService } from '../../services/user.service';
 import { Friends } from '../../models/friends.model';
+import { FriendsService } from '../../services/friends.service';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-conversation-messages',
@@ -32,6 +34,7 @@ import { Friends } from '../../models/friends.model';
     CommonModule,
     MessagesComponent,
     RouterOutlet,
+    MatProgressBarModule
   ],
 })
 export class ConversationMessagesComponent implements OnInit, OnDestroy {
@@ -48,15 +51,29 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
   protected read = false;
   private destroy$ = new Subject<void>();
   protected recipient: any;
+  protected friendList: Friends[] = [];
+  private friendListSubscription!: Subscription;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private chatService: ChatService,
     private userService: UserService,
+    private friendsService: FriendsService,
     private router: Router
   ) {
     this.subscribeToUserChanges();
     this.subscribeToRecipientChanges();
+    this.friendList$();
+  }
+
+  protected friendList$(): void {
+    this.friendListSubscription = this.friendsService
+      .returnFriendList()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((friendList: any) => {
+        this.friendList = friendList;
+      
+      });
   }
 
   private subscribeToUserChanges(): void {
@@ -74,9 +91,6 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
         if (recipient) {
           this.recipient = recipient;
         }
-        if (this.recipient.name === '') {
-          this.recipient.name = localStorage.getItem('lastFriend');
-        }
       });
   }
 
@@ -88,6 +102,7 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
     // Listens for new messages from socket.io
     this.fetchMessages();
   }
+
 
   // When logging in, or refreshing the page, it takes the last 11 messages.
   async getMessages(
@@ -115,8 +130,10 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
       this.activatedRoute.paramMap
         .pipe(takeUntil(this.destroy$))
         .subscribe(async (params) => {
-          if (!this.recipient.id) {
+          if (!this.recipient.id || !this.recipient.name) {
             this.recipient.id = params.get('userId');
+            const friend: any = await firstValueFrom(this.chatService.getFriendById(this.recipient));
+            this.chatService.addNewRecipient(this.recipient.id, friend.name);
           }
           this.messages = [];
           this.offset = 0;
@@ -193,11 +210,5 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  noParameter() {
-    if (this.recipient.id === '') {
-      this.router.navigate(['chat']);
-    }
   }
 }
