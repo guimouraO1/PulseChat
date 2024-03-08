@@ -1,94 +1,192 @@
 <main class="main-container">
   <div class="side-nav" [class.hide]="hide">
     <div class="side-nav-content" [class.hide]="hide">
-      <div class="menu" [class.hide]="hide">
-        
-        <button mat-icon-button [matMenuTriggerFor]="menu">
-          <mat-icon>menu</mat-icon>
-        </button>
-
-        <mat-menu class="menuOpen" #menu="matMenu" panelClass="example-panel">
-          <button (click)="goToProfile()" class="menu-item" mat-menu-item>
-            <mat-icon>person</mat-icon>
-            <span class="span">Profile</span>
+        <div class="menu" [class.hide]="hide">
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>menu</mat-icon>
           </button>
-          <button class="menu-item" mat-menu-item (click)="logout()">
-            <mat-icon class="exit-button">exit_to_app</mat-icon>
-            <span class="span">Logout</span>
-          </button>
-        </mat-menu>
-        
-        <div class="expandFalse">
-          <button class="expandBtn" (click)="changeHide()" mat-icon-button>
-            @if (hide) {
-            <mat-icon color="primary">expand_more</mat-icon>
-            }@else {
-            <mat-icon color="primary">expand_less</mat-icon>
-            }
-          </button>
-        </div>
-      </div>
 
-      <div [class.hide]="hide" class="user-greeting">
-        <span>Welcome back </span>
-        <span class="username">{{ user?.name }}</span>
-      </div>
+          <mat-menu class="menuOpen" #menu="matMenu" panelClass="example-panel">
+            <button (click)="goToProfile()" class="menu-item" mat-menu-item>
+              <mat-icon>person</mat-icon>
+              <span class="span">Profile</span>
+            </button>
+            <button class="menu-item" mat-menu-item (click)="logout()">
+              <mat-icon class="exit-button">exit_to_app</mat-icon>
+              <span class="span">Logout</span>
+            </button>
+          </mat-menu>
 
-      <div class="search" [class.hide]="hide">
-        <mat-form-field class="chat-input" appearance="outline">
-          <input matInput [(ngModel)]="searchFriend" (change)="searchFriendFunc()" placeholder="Search" #searchField />
-          <mat-icon class="searchIcon" matSuffix (click)="searchFriendFunc()">search</mat-icon>
-        </mat-form-field>
-      </div>
-
-      <div class="friends" [class.hide]="hide">
-        @for (friend of filteredFriend; track $index) {
-        <div class="friends-card" (click)="goToUser(friend)">
-          <div class="status">
-            @if (isFrindConnected(friend)){
-            <!-- <div class="online"></div> -->
-            <mat-icon color="primary"> trip_origin</mat-icon>
-            } @else {
-            <mat-icon color="warn"> trip_origin</mat-icon>
-            <!-- <div class="offline"></div> -->
-            }
-            <p class="userName">{{ friend.name }}</p>
+          <div class="expandFalse">
+            <button class="expandBtn" (click)="changeHide()" mat-icon-button>
+              @if (hide) {
+              <mat-icon color="primary">expand_more</mat-icon>
+              }@else {
+              <mat-icon color="primary">expand_less</mat-icon>
+              }
+            </button>
           </div>
+        </div>
 
-          @if (this.newMessages.has(friend.id) && this.newMessages.get(friend.id) > 0) {
-            @if (this.newMessages.get(friend.id) > 9) {
-              <div
-              matBadge="9+"
-              matBadgeSize="small"
-              matBadgeColor="warn"
-              class="messages">
-              <mat-icon>mail_outline</mat-icon>
-            </div>
-            } @else {
-              <div
-              matBadge="{{ this.newMessages.get(friend.id) }}"
-              matBadgeSize="small"
-              matBadgeColor="warn"
-              class="messages"> <mat-icon>mail_outline</mat-icon>
-            </div>
-            }
+        <div [class.hide]="hide" class="user-greeting">
+          <span class="welcome">Welcome back </span>
+          <span class="username">{{ user?.name }}</span>
+        </div>
 
-          } @else {
-          <div class="message"><mat-icon>mail_outline</mat-icon></div>
+        <div class="search" [class.hide]="hide">
+          <mat-form-field class="chat-input" appearance="outline">
+            <input
+              matInput
+              [(ngModel)]="searchInput"
+              (keyup.enter)="searchFriendFunc()"
+              placeholder="Search"
+              #searchField
+            />
+            <button
+              matSuffix
+              color="primary"
+              mat-icon-button
+              class="searchIcon"
+              (click)="searchFriendFunc()"
+            >
+              <mat-icon>search</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
+        <div class="friends" [class.hide]="hide">
+          @if (filteredFriendList.length > 0) {
+            <span>My friend list</span>
           }
+          @for (friend of filteredFriendList; track $index) { 
+            <div class="friends-card" (click)="goToUser(friend)">
+              
+              <div class="status">
+              @if (isFrindConnected(friend)){  <!--  ME ATENTAR A ISSO COLOCAR UM SIGNAL -->
+                <mat-icon color="primary">fiber_manual_record</mat-icon>
+                } @else {
+                <mat-icon color="warn">fiber_manual_record</mat-icon>
+                }
+                <p class="userName">{{ friend.name }}</p>
+              </div>
+
+              @if (this.newMessages.has(friend.id) && this.newMessages.get(friend.id) > 0) { 
+                @if (this.newMessages.get(friend.id) > 9) {
+                    <button
+                      matSuffix
+                      color="primary"
+                      mat-icon-button
+                      matBadge="9+"
+                      matBadgeSize="small"
+                      matBadgeColor="warn"
+                    >
+                      <mat-icon>mail_outline</mat-icon>
+                    </button>
+                } @else {
+                    <div class="messages">
+                      <button
+                        matSuffix
+                        color="primary"
+                        mat-icon-button
+                        class="searchIcon"
+                        matBadge="{{ this.newMessages.get(friend.id) }}"
+                        matBadgeSize="small"
+                        matBadgeColor="warn"
+                      >
+                        <mat-icon>mail_outline</mat-icon>
+                      </button>
+                    </div>
+                } 
+              } @else {
+                <div class="message">
+                  <button matSuffix color="primary" mat-icon-button>
+                    <mat-icon>mail_outline</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+
+          } @empty { 
+              @if (searchUserInfo) {
+              <div class="friends-card">
+                <p>{{ searchUserInfo.name }}</p>
+                <button
+                  matSuffix
+                  color="primary"
+                  mat-icon-button
+                  class="searchIcon"
+                  (click)="addThisUser(searchUserInfo)"
+                  matTooltip="Add this user? Click here!"
+                  matTooltipPosition="after"
+                >
+                  <mat-icon>person_add</mat-icon>
+                </button>
+              </div>
+              }
+            }
+
+            @if(this.friendListRequestReceived.length > 0) {
+              <span>Friend request recived </span>
+            }
+            @for (friend of this.friendListRequestReceived; track $index) { 
+                <div class="friends-card">
+                  <div class="status">
+                    <mat-icon>fiber_manual_record</mat-icon>
+                    <p class="userName">{{ friend.name }}</p>
+                  </div>
+                  <div class="message">
+                    <button
+                      (click)="refuseFriendshipReceived(friend)"
+                      mat-icon-button
+                      color="warn"
+                    >
+                      <mat-icon>delete_forever</mat-icon>
+                    </button>
+                    <button
+                      (click)="acceptFriendship(friend)"
+                      mat-icon-button
+                      color="primary"
+                    >
+                      <mat-icon>check_circle</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+            }
+      
+            @if(this.friendListRequestSent.length > 0) {
+              <span>Friend request sent</span>
+            }
+            @for (friend of this.friendListRequestSent; track $index) { 
+              <div class="friends-card">
+                <div class="status">
+                  <mat-icon>fiber_manual_record</mat-icon>
+                  <p class="userName">{{ friend.name }}</p>
+                </div>
+                  <button
+                    (click)="refuseFriendshipSent(friend)"
+                    mat-icon-button
+                    color="warn"
+                  >
+                    <mat-icon>delete_forever</mat-icon>
+                  </button>
+                  
+                  <button
+                    matTooltip="Waiting for user response"
+                    matTooltipPosition="after"
+                    mat-icon-button
+                    color="primary">
+                    <mat-icon>autorenew</mat-icon>
+                  </button>
+              </div>
+
+            }
+
         </div>
 
-        } @empty {
-          <div class="friends-card">
-            <p>No friends found</p>
-          </div>
-        <div class="friends-card">
-          <p>Add a new one?</p>
-          <mat-icon>person_add</mat-icon>
-        </div>
-        }
+
       </div>
-    </div>
   </div>
   <router-outlet />
 </main>
+

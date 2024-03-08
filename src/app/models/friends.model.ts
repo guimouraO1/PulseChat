@@ -1,5 +1,7 @@
 export interface Friends {
-    status: string,
+    status?: string,
     id: string,
-    name: string
+    name: string,
+    senderID?: string,
+    friendID?: string
 }

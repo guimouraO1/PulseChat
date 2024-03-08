@@ -1,15 +1,9 @@
-import {
-  Component,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { Subject, firstValueFrom, map, take, takeUntil } from 'rxjs';
+import { Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { MessagesComponent } from '../../components/messages/messages.component';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +14,8 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MessagesInterface } from '../../models/messages.model';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Friends } from '../../models/friends.model';
+import { FriendsService } from '../../services/friends.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-chat',
@@ -36,6 +32,7 @@ import { Friends } from '../../models/friends.model';
     MatBadgeModule,
     AsyncPipe,
     MatDialogModule,
+    MatTooltipModule,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -45,22 +42,24 @@ export class ChatComponent implements OnInit, OnDestroy {
   // This user {}.
   protected user: any;
   // If you have the id in the array and newMessages = true matBadge appears in the friend that there will be new messages.
-  protected newMessages: Map<any, any> = new Map;
+  protected newMessages: Map<any, any> = new Map();
 
-  protected searchFriend: string = '';
-
-  protected friends: Friends[] = [];
-
-  protected filteredFriend: Friends[] = [];
-
-  protected connectedUsers: any;
+  protected searchInput: string = '';
+  protected searchUserInfo: any;
 
   protected hide: boolean = true;
+
+  protected onlineFriends: Friends[] = [];
+  protected friendList: Friends[] = [];
+  protected filteredFriendList: Friends[] = [];
+  protected friendListRequestSent: Friends[] = [];
+  protected friendListRequestReceived: Friends[] = [];
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private userService: UserService,
+    private friendsService: FriendsService,
     private router: Router,
     private chatService: ChatService,
     public dialog: MatDialog
@@ -69,13 +68,21 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.subscribeToRecipientChanges();
   }
 
+  async ngOnInit() {
+    // Get your user infos. ex: user.name, user.email, user.id
+    await this.connectUser();
+    // Get all friends. ex: user.name, user.email, user.id
+    await this.getFriends();
+    // Listens for new messages from socket.io
+    this.fetchMessages();
+    // Listens for new messages from newMessageEmmiter and newMessageEmmiterId.
+    this.setupMessageListeners();
 
-  searchFriendFunc(){
-    if (this.searchFriend == '') {
-      this.filteredFriend = this.friends;
-      return;
-    }
-    this.filteredFriend = this.friends.filter(friend => friend.name.toLowerCase().includes(this.searchFriend.toLowerCase()));
+    this.newFriendsRequestsListener();
+
+    this.acceptedFriendsListener();
+
+    this.deleteFriendshipRequestListener();
   }
 
   private subscribeToUserChanges(): void {
@@ -92,18 +99,6 @@ export class ChatComponent implements OnInit, OnDestroy {
       .subscribe((recipient) => (this.recipient = recipient));
   }
 
-  async ngOnInit() {
-    // Get your user infos. ex: user.name, user.email, user.id
-    await this.connectUser();
-    // Get all friends. ex: user.name, user.email, user.id
-    await this.getFriends();
-    // Listens for new messages from socket.io
-    this.fetchMessages();
-    // Listens for new messages from newMessageEmmiter and newMessageEmmiterId.
-    this.setupMessageListeners();
-  }
-
-  // Get your user infos. ex: user.name, user.email, user.id
   async connectUser() {
     try {
       this.chatService.connect(this.user);
@@ -113,16 +108,54 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
+  connectedUsersListener() {
+    this.chatService
+      .connectedUsersListener()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((onlineFriends: any) => {
+        const connectedUsersArray = JSON.parse(onlineFriends);
+        this.onlineFriends = connectedUsersArray;
+      });
+  }
+
   async getFriends() {
     try {
-      const friends = await firstValueFrom(this.userService.getFriends());
-      this.friends = friends;
-      this.filteredFriend = friends;
-      for (const friend of this.friends) {
+      const friends: Friends[] = await firstValueFrom(this.friendsService.getFriends());
+      
+      this.friendListRequestSent = friends.filter(friend => friend.senderID === this.user.id && friend.status === 'Pending');
+      this.friendListRequestReceived = friends.filter(friend => friend.senderID !== this.user.id && friend.status === 'Pending');
+      this.friendList = friends.filter(friend => friend.status === 'Accepted');
+
+      await Promise.all(this.friendList.map(async friend => {
         await this.getMessages(friend, 0, 10);
-      }
+      }));
+  
+      // console.log('Enviados', this.friendListRequestSent);
+      // console.log('Recebidos', this.friendListRequestReceived);
+      // console.log('Amigos', this.friendList);
+  
+      this.filteredFriendList = this.friendList;
+  
     } catch (error) {
       console.error('Error while fetching friends:', error);
+    }
+  }
+  
+  // When logging in, or refreshing the page, it takes the last message, if it has message.read = false means there is a new message that has not been read.
+  async getMessages(
+    recipient: Friends,
+    offset: number,
+    limit: number
+  ): Promise<void> {
+    try {
+      const messages = await firstValueFrom(this.chatService.getMessagesDb(recipient, offset, limit));
+      messages.forEach((message: MessagesInterface) => {
+        if (message.read === 'false') {
+          this.newMessages.set(message.authorMessageId, (this.newMessages.get(message.authorMessageId) || 0) + 1);
+        }
+      });
+    } catch (error) {
+      console.error('Error while fetching messages:', error);
     }
   }
 
@@ -139,64 +172,71 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
-  connectedUsersListener() {
+  newFriendsRequestsListener(): void {
     this.chatService
-      .connectedUsersListener()
+      .newFriendsRequestsListener()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((connectedUsers: any) => {
-        const connectedUsersArray = JSON.parse(connectedUsers);
-        this.connectedUsers = connectedUsersArray;
+      .subscribe((user: any) => {
+        this.friendListRequestReceived.push(user);
       });
   }
 
-  isFrindConnected(friend: Friends): boolean {
-    if (!this.connectedUsers) {
-      return false;
-    }
-    return this.connectedUsers.some((userConnected: any) => {
-      return userConnected === friend.id;
-    });
+  acceptedFriendsListener(): void {
+    this.chatService
+      .acceptedFriendsListener()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user: any) => {
+        this.friendListRequestSent.splice(this.friendListRequestSent.indexOf(user), 1);
+        this.friendList.push(user);
+        this.filteredFriendList = this.friendList;
+      });
+  }
+
+  deleteFriendshipRequestListener(): void {
+    this.chatService
+      .deleteFriendshipRequestListener()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user: any) => {
+        this.friendListRequestSent.splice(this.friendListRequestSent.indexOf(user), 1);
+        this.friendListRequestReceived.splice(this.friendListRequestReceived.indexOf(user), 1);
+      });
   }
 
   // Listens for new messages from newMessageEmmiterId. If the array contains the id of a specific friend, it means that there are new messages from that friend.
   setupMessageListeners() {
     this.chatService.newMessageEmmiterId
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((newMessageId: string) => {
-            this.newMessages.set(newMessageId, (this.newMessages.get(newMessageId) || 0) + 1);
-        });
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((newMessageId: string) => {
+        this.newMessages.set(newMessageId, (this.newMessages.get(newMessageId) || 0) + 1);
+      });
   }
 
-  // When logging in, or refreshing the page, it takes the last message, if it has message.read = false means there is a new message that has not been read.
-  async getMessages(
-    recipient: Friends,
-    offset: number,
-    limit: number): Promise<void> {
+  async searchUser(username: string) {
     try {
-        const messages = await firstValueFrom(this.chatService.getMessagesDb(recipient, offset, limit));
-        messages.forEach((message: MessagesInterface) => {
-            if (message.read === 'false') {
-                this.newMessages.set(message.authorMessageId, (this.newMessages.get(message.authorMessageId) || 0) + 1);
-            }
-        });
+      const user: any = await firstValueFrom(this.friendsService.searchUser(username));
+      if(this.user.id === user.id || this.friendList.find(friend => friend.id === user.id) || this.friendListRequestSent.find(friend => friend.id === user.id)) {
+        this.searchInput = '';
+        return;
+      }
+      this.searchUserInfo = user;
+      this.searchInput = '';
     } catch (error) {
-        console.error('Error while fetching messages:', error);
+      console.error('Error while fetching friends:', error);
     }
   }
 
+  isFrindConnected(friend: Friends): boolean {
+    if (!this.onlineFriends) {
+      return false;
+    }
+    return this.onlineFriends.some((userConnected: any) => {
+      return userConnected === friend.id;
+    });
+  }
+
   // After reading a new message read = 'true' on the message that have already been read.
-  updateMessageAsRead(authorMessageId: string, recipientId: string) {
-    this.chatService
-      .updateMessageAsRead(authorMessageId, recipientId)
-      .pipe(take(1))
-      .subscribe({
-        next: (res) => {
-          // console.log(res);
-        },
-        error: (e) => {
-          // console.error('Erro ao obter usuário:', error);
-        },
-      });
+  async updateMessageAsRead(authorMessageId: string, recipientId: string) {
+    await firstValueFrom(this.chatService.updateMessageAsRead(authorMessageId, recipientId));
   }
 
   // When click on a friend card it takes you to chat with that user.
@@ -205,15 +245,25 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.updateMessageAsRead(recipient.id, this.user.id);
       localStorage.setItem('lastFriend', recipient.name);
     } catch (error) {}
-    this.chatService.addNewRecipient(recipient);
-
+      this.chatService.addNewRecipient(recipient);
     // Checks if userId is present in newMessagesId.
     if (this.newMessages.has(recipient.id)) {
       // Remove userId do set newMessagesId.
       this.newMessages.delete(recipient.id);
     }
-
+    // Checks if recipient is your friend.
     this.router.navigate(['chat', recipient.id]);
+    
+  }
+
+  searchFriendFunc() {
+    if (this.searchInput.trim() == '') {
+      this.filteredFriendList = this.friendList;
+      this.searchUserInfo = false;
+      return;
+    }
+    this.searchUser(this.searchInput);
+    this.filteredFriendList = this.friendList.filter((friend) => friend.name.toLowerCase().includes(this.searchInput.toLowerCase()));
   }
 
   // LogOut
@@ -226,11 +276,42 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   goToProfile() {
-    this.router.navigate(['profile']);
+    // this.router.navigate(['profile']);
   }
 
   changeHide() {
     this.hide = !this.hide;
+  }
+
+  async addThisUser(user: any) {
+    const idFriendship = await firstValueFrom(this.friendsService.sendFriendRequest(user.id));
+    this.chatService.sentNewFriendship(this.user.id, user.id, this.user.name, idFriendship);
+    user.idFriendship = idFriendship;
+    this.searchInput = '';
+    this.friendListRequestSent.push(user);
+    this.searchUserInfo = '';
+
+
+  }
+
+  async refuseFriendshipReceived(friend: any) {
+    await firstValueFrom(this.friendsService.removeFriendRequest(friend.idFriendship));
+    this.friendListRequestReceived.splice(this.friendListRequestReceived.indexOf(friend), 1);
+    this.chatService.deleteFriendshipRequest(this.user.id, friend.id, this.user.name, friend.idFriendship);
+  }
+
+  async refuseFriendshipSent(friend: any) {
+    await firstValueFrom(this.friendsService.removeFriendRequest(friend.idFriendship));
+    this.friendListRequestSent.splice(this.friendListRequestSent.indexOf(friend), 1);
+    this.chatService.deleteFriendshipRequest(this.user.id, friend.id, this.user.name, friend.idFriendship);
+  }
+
+  async acceptFriendship(friend: any) {
+    await firstValueFrom(this.friendsService.acceptFriendship(friend.idFriendship));
+    this.friendList.push(friend);
+    this.friendListRequestReceived.splice(this.friendListRequestReceived.indexOf(friend), 1);
+    this.chatService.acceptFriendship(this.user.id, friend.id, this.user.name, friend.idFriendship);
+    this.searchInput = ``;
   }
 
   ngOnDestroy() {

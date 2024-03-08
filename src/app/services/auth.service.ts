@@ -4,8 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { environment } from '../environments/environment';
 import { Subject, lastValueFrom, take } from 'rxjs';
-import { UserService } from './user.service';
-import { User } from '../models/user.model';
+
 
 @Injectable({
   providedIn: 'root',
