@@ -46,7 +46,7 @@
   }
 
   .chat-input {
-    width: 93%;
+    width: 90%;
     input {
       color: colors.$text-primary;
     }
@@ -58,7 +58,7 @@
 }
 
 /* Add media query for mobile */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1100px) {
   .chat{
     width: 100vw;
     height: 90vh;

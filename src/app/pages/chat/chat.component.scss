@@ -21,13 +21,12 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      padding: 20px;
 
       .menu {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        // justify-content: flex-start;
+        padding: 20px;        
         width: 100%;
 
         .expandFalse {
@@ -98,7 +97,7 @@
         height: 70vh;
         overflow-y: auto;
         overflow-x: hidden;
-        
+        width: 90%;
         .friends-card {
           display: flex;
           flex-direction: row;
@@ -106,27 +105,33 @@
           justify-content: space-between;
           text-wrap: pretty-block;
           cursor: pointer;
-          width: 20vw;
+          width: 100%;
           background-color: colors.$cardBackground;
           border-radius: 4px;
           padding: 6px 20px;
-          .message{
+
+          .message {
             display: flex;
+            justify-content: flex-end;
           }
           .status {
             display: flex;
+            flex-direction: row;
             align-items: center;
+            justify-content: flex-start;
             width: 80%;
-            gap: 10px;
+            gap: 4px;
+            text-wrap: pretty-block;
 
             .userName {
-              width: 80%;
               text-wrap: pretty-block;
               color: colors.$text-primary;
               font-family: "Fredoka", sans-serif;
               word-wrap: break-word;
             }
             mat-icon{
+              padding: 0px !important;
+              margin: 0px !important;
               transform: scale(0.8);
             }
           }
@@ -162,8 +167,38 @@
   color: colors.$searchColorDeafaut !important;
 }
 
+// /* Add media query for mobile */
+// @media screen and (max-width: 1000px) {
+//   .friends {
+
+//     .friends-card {
+//       display: flex;
+//       flex-direction: column;
+//       align-items: center;
+//       justify-content: center;
+//       text-wrap: pretty-block;
+//       cursor: pointer;
+//       width: 100%;
+//       background-color: rgba(71, 71, 71, 0.199);
+//       border-radius: 4px;
+//       padding: 6px 20px;
+      
+//       .status {
+//         background-color: rgba(66, 143, 143, 0.144);
+//         display: flex;
+//         flex-direction: row;
+//         align-items: center;
+//         justify-content: flex-start;
+//         gap: 4px;
+//         text-wrap: pretty-block;
+//       }
+//     }
+//   }
+// }
+
+
 /* Add media query for mobile */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1100px) {
   .main-container {
     flex-direction: column;
     .side-nav {
@@ -174,7 +209,7 @@
       }
       .side-nav-content {
         width: 100%;
-        height: 100%;
+        height: 90%;
         padding: 0px;
         margin-top: 20px;
         &.hide {

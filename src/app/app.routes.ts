@@ -18,6 +18,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/login/login.component').then((p) => p.LoginComponent),
       },
+      {
+        path: 'register',
+        title: 'PulseChat | Register',
+        loadComponent: () =>
+          import('./pages/register/register.component').then((p) => p.RegisterComponent),
+      },
     ],
   },
   {
@@ -32,11 +38,6 @@ export const routes: Routes = [
             path: ':userId',
             component: ConversationMessagesComponent
           }]
-      },
-      {
-        path: 'profile',
-        title: 'PulseChat | Profile',
-        loadComponent: () => import('./pages/profile/profile.component').then((p) => p.ProfileComponent)
       },
     ],
   },

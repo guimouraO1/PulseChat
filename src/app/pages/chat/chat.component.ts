@@ -16,6 +16,9 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Friends } from '../../models/friends.model';
 import { FriendsService } from '../../services/friends.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-chat',
@@ -33,9 +36,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     AsyncPipe,
     MatDialogModule,
     MatTooltipModule,
+    ConfirmPopupModule, 
+    ToastModule,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
+  providers: [ConfirmationService, MessageService]
+
 })
 export class ChatComponent implements OnInit, OnDestroy {
   private recipient: any;
@@ -62,7 +69,9 @@ export class ChatComponent implements OnInit, OnDestroy {
     private friendsService: FriendsService,
     private router: Router,
     private chatService: ChatService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private confirmationService: ConfirmationService, 
+    private messageService: MessageService
   ) {
     this.subscribeToUserChanges();
     this.subscribeToRecipientChanges();
@@ -213,8 +222,9 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   async searchUser(username: string) {
     try {
+      if(this.searchInput.trim() === '') return;
       const user: any = await firstValueFrom(this.friendsService.searchUser(username));
-      if(this.user.id === user.id || this.friendList.find(friend => friend.id === user.id) || this.friendListRequestSent.find(friend => friend.id === user.id)) {
+      if(this.user.id === user.id || this.friendList.find(friend => friend.id === user.id) || this.friendListRequestSent.find(friend => friend.id === user.id) || this.friendListRequestReceived.find(friend => friend.id === user.id)) {
         this.searchInput = '';
         return;
       }
@@ -268,8 +278,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   // LogOut
   logout(): void {
-    localStorage.removeItem('users');
-    localStorage.removeItem('Friends');
     localStorage.removeItem('token');
     this.chatService.socketdisconnect();
     this.router.navigate(['login']);
@@ -294,6 +302,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   async refuseFriendshipReceived(friend: any) {
+    console.log(friend);
     await firstValueFrom(this.friendsService.removeFriendRequest(friend.idFriendship));
     this.friendListRequestReceived.splice(this.friendListRequestReceived.indexOf(friend), 1);
     this.chatService.deleteFriendshipRequest(this.user.id, friend.id, this.user.name, friend.idFriendship);
@@ -306,12 +315,63 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   async acceptFriendship(friend: any) {
-    await firstValueFrom(this.friendsService.acceptFriendship(friend.idFriendship));
-    this.friendList.push(friend);
-    this.friendListRequestReceived.splice(this.friendListRequestReceived.indexOf(friend), 1);
-    this.chatService.acceptFriendship(this.user.id, friend.id, this.user.name, friend.idFriendship);
-    this.searchInput = ``;
+    try{
+      await firstValueFrom(this.friendsService.acceptFriendship(friend.idFriendship));
+      this.friendList.push(friend);
+      this.friendListRequestReceived.splice(this.friendListRequestReceived.indexOf(friend), 1);
+      this.chatService.acceptFriendship(this.user.id, friend.id, this.user.name, friend.idFriendship);
+      this.searchInput = ``;
+    }catch{
+
+    }
   }
+
+    acceptNgFriendship(event: Event, friend: Friends) {
+      this.confirmationService.confirm({
+          target: event.target as EventTarget,
+          message: 'Are you sure you want to accept this friend request?',
+          icon: 'pi pi-exclamation-triangle',
+          accept: async () => {
+            this.messageService.add({ severity: 'success', summary: 'Confirmed', detail: `You have accepted ${friend.name}`, life: 4000});
+            await this.acceptFriendship(friend);
+          },
+          reject: () => {
+              this.messageService.add({ severity: 'error', summary: 'Rejected', detail: `You have cancel the action`, life: 4000 });
+          }
+      });
+  }
+
+  refuseNgFriendship(event: Event, friend: Friends) {
+      this.confirmationService.confirm({
+          target: event.target as EventTarget,
+          message: 'Do you want to reject this friend request?',
+          icon: 'pi pi-info-circle',
+          acceptButtonStyleClass: 'p-button-danger p-button-sm',
+          accept: async () => {
+              this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: `Request for friendship with ${friend.name} has been rejected.`, life: 3000 });
+              await this.refuseFriendshipReceived(friend);
+          },
+          reject: () => {
+              this.messageService.add({ severity: 'error', summary: 'Cancel', detail: 'You have cancel the action', life: 3000 });
+          }
+      });
+  }
+
+  refuseNgFriendshipSent(event: Event, friend: Friends) {
+    this.confirmationService.confirm({
+        target: event.target as EventTarget,
+        message: 'Do you want to delete this friend request?',
+        icon: 'pi pi-info-circle',
+        acceptButtonStyleClass: 'p-button-danger p-button-sm',
+        accept: async () => {
+            this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: `The friend request to ${friend.name} has been cancelled.`, life: 3000 });
+            await this.refuseFriendshipSent(friend);
+        },
+        reject: () => {
+            this.messageService.add({ severity: 'error', summary: 'Cancel', detail: 'You have cancel the action', life: 3000 });
+        }
+    });
+}
 
   ngOnDestroy() {
     this.destroy$.next();

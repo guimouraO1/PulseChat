@@ -42,9 +42,10 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    
-    this.listenDisableButton = this.authService.getEventEmitter().subscribe((value) => this.disableButton = value);
-    }
+    this.listenDisableButton = this.authService
+      .getEventEmitter()
+      .subscribe((value) => (this.disableButton = value));
+  }
 
   async ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -59,14 +60,6 @@ export class LoginComponent implements OnInit {
     await this.authService.login(this.loginForm.value);
   }
 
-  openSnackBar(): void {
-    this.snackBar.open('Complete all the fields correctly.', 'I understood!', {
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      duration: 8000,
-    });
-  }
-
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.login();
@@ -76,7 +69,6 @@ export class LoginComponent implements OnInit {
 
   async isLogged() {
     let result = await this.authService.asycUserAuthentication();
-
     if (result) {
       this.router.navigate(['chat']);
     } else {

@@ -1,9 +1,14 @@
 <main class="main-container">
   <div class="side-nav" [class.hide]="hide">
     <div class="side-nav-content" [class.hide]="hide">
+
         <div class="menu" [class.hide]="hide">
           <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>menu</mat-icon>
+          </button>
+
+          <button mat-icon-button>
+            <mat-icon>person</mat-icon>
           </button>
 
           <mat-menu class="menuOpen" #menu="matMenu" panelClass="example-panel">
@@ -16,6 +21,7 @@
               <span class="span">Logout</span>
             </button>
           </mat-menu>
+          
 
           <div class="expandFalse">
             <button class="expandBtn" (click)="changeHide()" mat-icon-button>
@@ -55,6 +61,8 @@
         </div>
 
         <div class="friends" [class.hide]="hide">
+          <p-toast></p-toast>
+          <p-confirmPopup></p-confirmPopup>
           @if (filteredFriendList.length > 0) {
             <span>My friend list</span>
           }
@@ -123,67 +131,67 @@
                 </button>
               </div>
               }
-            }
+          }
 
-            @if(this.friendListRequestReceived.length > 0) {
-              <span>Friend request recived </span>
-            }
-            @for (friend of this.friendListRequestReceived; track $index) { 
-                <div class="friends-card">
-                  <div class="status">
-                    <mat-icon>fiber_manual_record</mat-icon>
-                    <p class="userName">{{ friend.name }}</p>
-                  </div>
-                  <div class="message">
-                    <button
-                      (click)="refuseFriendshipReceived(friend)"
-                      mat-icon-button
-                      color="warn"
-                    >
-                      <mat-icon>delete_forever</mat-icon>
-                    </button>
-                    <button
-                      (click)="acceptFriendship(friend)"
-                      mat-icon-button
-                      color="primary"
-                    >
-                      <mat-icon>check_circle</mat-icon>
-                    </button>
-                  </div>
-                </div>
-
-            }
-      
-            @if(this.friendListRequestSent.length > 0) {
-              <span>Friend request sent</span>
-            }
-            @for (friend of this.friendListRequestSent; track $index) { 
+          @if(this.friendListRequestReceived.length > 0) {
+            <span>Friend request recived </span>
+          }
+          @for (friend of this.friendListRequestReceived; track $index) { 
               <div class="friends-card">
                 <div class="status">
                   <mat-icon>fiber_manual_record</mat-icon>
                   <p class="userName">{{ friend.name }}</p>
                 </div>
+                <div class="message">
                   <button
-                    (click)="refuseFriendshipSent(friend)"
+                    (click)="refuseNgFriendship($event, friend)"
                     mat-icon-button
                     color="warn"
                   >
                     <mat-icon>delete_forever</mat-icon>
                   </button>
-                  
                   <button
-                    matTooltip="Waiting for user response"
-                    matTooltipPosition="after"
+                    (click)="acceptNgFriendship($event, friend)"
                     mat-icon-button
-                    color="primary">
-                    <mat-icon>autorenew</mat-icon>
+                    color="primary"
+                  >
+                    <mat-icon>check_circle</mat-icon>
                   </button>
+                </div>
               </div>
 
-            }
+          }
+
+          @if(this.friendListRequestSent.length > 0) {
+            <span>Friend request sent</span>
+          }
+          @for (friend of this.friendListRequestSent; track $index) { 
+            <div class="friends-card">
+              <div class="status">
+                <mat-icon>fiber_manual_record</mat-icon>
+                <p class="userName">{{ friend.name }}</p>
+              </div>
+              <div class="message">
+                <button
+                  (click)="refuseNgFriendshipSent($event, friend)"
+                  mat-icon-button
+                  color="warn"
+                >
+                  <mat-icon>delete_forever</mat-icon>
+                </button>
+                
+                <button
+                  matTooltip="Waiting for user response"
+                  matTooltipPosition="after"
+                  mat-icon-button
+                  color="primary">
+                  <mat-icon>autorenew</mat-icon>
+                </button>
+            </div>
+          </div>
+          }
 
         </div>
-
 
       </div>
   </div>
