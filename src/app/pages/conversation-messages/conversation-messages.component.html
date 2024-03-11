@@ -1,10 +1,10 @@
+<p-toast></p-toast>
 <div class="chat">
   <div class="userInfo">
     @if (this.recipient.name) {
       <span>Talking to <span class="username">{{ recipient.name }}</span></span>
     } @else {
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-
     }
   </div>
   <div class="chat-messages" #scrollPanel (scroll)="scrollOnTop()">

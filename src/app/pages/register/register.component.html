@@ -1,3 +1,125 @@
-<div class="main">
+<main class="main-container">
+  <div class="card">
+    <!-- <form
+        class="content"
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+      > -->
 
-</div>
+    <div class="content">
+      <p-toast></p-toast>
+
+      <mat-icon class="content-icon">person</mat-icon>
+      <form class="card-content" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input
+            type="email"
+            matInput
+            formControlName="email"
+          />
+          <mat-icon
+            color="primary"
+            matSuffix
+            >email</mat-icon
+          >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input
+              type="text"
+              [type]="'text'"
+              matInput
+              formControlName="username"
+            />
+            <mat-icon
+              color="primary"
+              matSuffix
+              >fingerprint</mat-icon
+            >
+          </mat-form-field>
+
+        <mat-form-field appearance="outline">
+        <mat-label>First Name</mat-label>
+        <input
+            [type]="'text'"
+            matInput
+            formControlName="firstName"
+        />
+        <mat-icon
+            color="primary"
+            matSuffix
+            >person</mat-icon
+        >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input
+              [type]="'text'"
+              matInput
+              formControlName="lastName"
+            />
+            <mat-icon
+              color="primary"
+              matSuffix
+              >person</mat-icon
+            >
+          </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Confirm Password</mat-label>
+          <input
+            matInput
+            [type]="hide ? 'password' : 'text'"
+            formControlName="confirmPassword"
+          />
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="hide = !hide"
+            [attr.aria-pressed]="hide"
+          >
+            <mat-icon color="primary">{{
+              hide ? 'visibility_off' : 'visibility'
+            }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              [type]="hide ? 'password' : 'text'"
+              formControlName="password"
+            />
+            <button
+              type="button"
+              mat-icon-button
+              matSuffix
+              (click)="hide = !hide"
+              [attr.aria-pressed]="hide"
+            >
+              <mat-icon color="primary">{{
+                hide ? 'visibility_off' : 'visibility'
+              }}</mat-icon>
+            </button>
+          </mat-form-field>
+          <button
+          class="button"
+          [disabled]="disableButton"
+          type="submit"
+          color="primary"
+          mat-stroked-button
+        >
+          Register
+        </button>
+      </form>
+      <p class="p">Return to login? <span (click)="goToLogin()">Click here!</span></p>
+
+    </div>
+  </div>
+</main>

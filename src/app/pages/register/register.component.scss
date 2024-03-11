@@ -1,8 +1,93 @@
-.main {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+@use '../../../assets/colors/colors.scss' as colors;
 
+.main-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .content {
+    width: 50vw;
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: column;
+    gap: 10px;
+    background-color: colors.$background2;
+    border-radius: 10px;
+
+    .p{
+      span{
+        cursor: pointer;
+        color: colors.$primary;
+      }
+    }
+    .card-content {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, auto);
+      grid-column-gap: 20px;
+      grid-row-gap: 10px;
+      justify-content: center;
+      align-items: center;
+      padding-bottom: 10px;
+
+      .mat-form-field {
+        grid-column: span 2;
+      }
+
+      .button {
+        width: 200px;
+        grid-column: 1 / span 2;
+        justify-self: center;
+      }
+    }
+    .content-icon {
+      margin-bottom: 60px;
+      transform: scale(5);
+    }
+
+    mat-form-field {
+      width: 20vw;
+    }
+    /* Substitue a cor da borda do input */
+    ::ng-deep .mdc-button--outlined .mdc-button__ripple {
+      border-color: colors.$searchColorDeafaut;
+    }
+    /* Substitue a cor da borda do input */
+    ::ng-deep .mdc-notched-outline > * {
+      border-color: colors.$searchColorDeafaut !important;
+    }
+    /* Substitue a cor da borda do input quando selecionado */
+    ::ng-deep .mdc-text-field--focused .mdc-notched-outline > * {
+      border-color: colors.$primary !important;
+    }
+
+
+    /* Substitue a cor do texto mat-label*/
+    mat-label {
+      color: colors.$text-primary;
+    }
+    /* Substitue a cor do texto do input */
+    input {
+      color: colors.$text-primary;
+    }
+  }
+  .icon {
+    align-self: flex-end; /* Alinha à direita */
+    margin: 20px;
+  }
+}
+/* Substitue a cor do autocomplete do background do input pela cor desejada.  (none)*/
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 0s 600000s, color 0s 600000s !important;
 }

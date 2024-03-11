@@ -14,6 +14,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-login',
@@ -26,9 +28,12 @@ import { Subscription } from 'rxjs';
     ReactiveFormsModule,
     MatSnackBarModule,
     MatTooltipModule,
+    ToastModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
+  providers: [MessageService],
+
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -40,7 +45,8 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {
     this.listenDisableButton = this.authService
       .getEventEmitter()
@@ -57,14 +63,35 @@ export class LoginComponent implements OnInit {
   }
 
   async login() {
-    await this.authService.login(this.loginForm.value);
+    const res = await this.authService.login(this.loginForm.value);
+    if(res.error)
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Alert',
+      detail: res.error.msg,
+      life: 3000,
+    });
   }
 
   onSubmit(): void {
+    if (!this.loginForm.valid) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Alert',
+        detail: `Please fill in all the required fields.`,
+        life: 3000,
+      });
+      return;
+    }
+
     if (this.loginForm.valid) {
       this.login();
     }
     return;
+  }
+
+  goToRegister(){
+    this.router.navigate(['register']);
   }
 
   async isLogged() {

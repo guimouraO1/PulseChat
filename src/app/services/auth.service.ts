@@ -1,11 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { environment } from '../environments/environment';
 import { Subject, lastValueFrom, take } from 'rxjs';
-import { ToastModule } from 'primeng/toast';
-
 
 @Injectable({
   providedIn: 'root',
@@ -16,12 +13,7 @@ export class AuthService {
   private disableButton = new Subject<boolean>();
   private user!: any;
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-    private snackBar: MatSnackBar) {
-
-    }
+  constructor(private http: HttpClient, private router: Router) {}
 
   async login(loginForm: {}) {
     this.disableButton.next(true);
@@ -30,9 +22,22 @@ export class AuthService {
       this._isAuthenticated = true;
       localStorage.setItem('token', res.authToken);
       this.router.navigate(['chat']);
-      this.openSnackBar('Login successful!', res.user.name);
+	  return res;
     } catch (error: any) {
-      this.openSnackBar(error.error.msg, '❌');
+		return error;
+    } finally {
+      this.disableButton.next(false);
+    }
+  }
+
+
+  async register(registerForm: {}) {
+    this.disableButton.next(true);
+    try {
+      const res: any = await lastValueFrom(this.http.post(`${this.urlApi}/register`, registerForm).pipe(take(1)));
+	  return res;
+    } catch (error: any) {
+		return error;
     } finally {
       this.disableButton.next(false);
     }
@@ -42,13 +47,15 @@ export class AuthService {
     const authToken = localStorage.getItem('token');
     const headers = new HttpHeaders().set('authorization', `${authToken}`);
     try {
-      const user = await lastValueFrom(this.http.get(`${this.urlApi}/user/auth`, { headers }).pipe(take(1)));
+      const user = await lastValueFrom(
+        this.http.get(`${this.urlApi}/user/auth`, { headers }).pipe(take(1))
+      );
       this.user = user;
       this._isAuthenticated = true;
-      return true
+      return true;
     } catch (e) {
       this._isAuthenticated = false;
-      return false
+      return false;
     }
   }
 
@@ -57,19 +64,11 @@ export class AuthService {
     return this._isAuthenticated;
   }
 
-  getUser(){
+  getUser() {
     return this.user;
-  }
-
-  openSnackBar(message: string, action: string) {
-    this.snackBar.open(message, action, {
-      duration: 2000,
-      verticalPosition: 'top'     
-    });
   }
 
   getEventEmitter() {
     return this.disableButton.asObservable();
   }
-
 }

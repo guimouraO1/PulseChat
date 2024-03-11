@@ -18,7 +18,12 @@
   padding: 10px;
   background-color: colors.$background2;
   border-radius: 10px;
-
+  p {
+    span {
+      color: colors.$primary;
+      cursor: pointer;
+    }
+  }
   .content {
     height: 100%;
     width: 100%;
@@ -26,10 +31,10 @@
     align-items: center;
     justify-content: flex-end;
     flex-direction: column;
-    margin-bottom: 12%;
+    margin-bottom: 10px;
     gap: 10px;
     overflow: hidden;
-    
+
     .content-icon {
       margin-bottom: 60px;
       transform: scale(5);
@@ -52,10 +57,9 @@
     }
 
     .button {
-      width: 40%;
-      color: colors.$text-primary;
+      width: 200px;
     }
-    
+
     /* Substitue a cor do texto mat-label*/
     mat-label {
       color: colors.$text-primary;

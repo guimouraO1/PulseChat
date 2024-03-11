@@ -19,7 +19,9 @@ import { ChatService } from '../../services/chat.service';
 import { UserService } from '../../services/user.service';
 import { Friends } from '../../models/friends.model';
 import { FriendsService } from '../../services/friends.service';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-conversation-messages',
@@ -34,8 +36,10 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     CommonModule,
     MessagesComponent,
     RouterOutlet,
-    MatProgressBarModule
+    MatProgressBarModule,
+    ToastModule
   ],
+  providers: [MessageService]
 })
 export class ConversationMessagesComponent implements OnInit, OnDestroy {
   // Declares a view query that selects all instances of MessagesComponent within the current component's view.
@@ -59,7 +63,8 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
     private chatService: ChatService,
     private userService: UserService,
     private friendsService: FriendsService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {
     this.subscribeToUserChanges();
     this.subscribeToRecipientChanges();
@@ -72,7 +77,6 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((friendList: any) => {
         this.friendList = friendList;
-      
       });
   }
 
@@ -102,7 +106,6 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
     // Listens for new messages from socket.io
     this.fetchMessages();
   }
-
 
   // When logging in, or refreshing the page, it takes the last 11 messages.
   async getMessages(
@@ -171,7 +174,13 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
 
   // Send message to private recipient in real time, and backend save on db.
   sendMessage(): void {
-    if (!this.inputMessage || this.inputMessage.trim() === '') return;
+    if (!this.inputMessage || this.inputMessage.trim() === '')
+      return;
+    if(!this.friendList.some(friend => friend.id === this.recipient.id)){
+      this.showError();
+      return;
+    }
+
     this.chatService.sendMessage(
       this.inputMessage, // message
       this.user.id, // authorMessageId
@@ -207,6 +216,10 @@ export class ConversationMessagesComponent implements OnInit, OnDestroy {
       .subscribe(() => this.scrollToLast());
   }
 
+  showError() {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'This user is not your friend, please add to chat.' });
+  }
+  
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();

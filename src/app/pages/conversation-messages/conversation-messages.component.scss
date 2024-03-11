@@ -1,4 +1,4 @@
-@use "../../../assets/colors/colors.scss" as colors;
+@use '../../../assets/colors/colors.scss' as colors;
 
 .chat {
   align-items: center;
@@ -30,7 +30,7 @@
     padding: 0px 20px;
     width: 90%;
     min-height: 70%;
-    
+
     &::-webkit-scrollbar {
       width: 7px;
 
@@ -59,10 +59,10 @@
 
 /* Add media query for mobile */
 @media screen and (max-width: 1100px) {
-  .chat{
+  .chat {
     width: 100vw;
     height: 90vh;
-    .userInfo{
+    .userInfo {
       margin: 0;
     }
   }

@@ -1,6 +1,6 @@
-@use "../../../assets/colors/colors.scss" as colors;
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Protest+Riot&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap");
+@use '../../../assets/colors/colors.scss' as colors;
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Protest+Riot&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
 
 .main-container {
   align-items: center;
@@ -26,7 +26,7 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        padding: 20px;        
+        padding: 20px;
         width: 100%;
 
         .expandFalse {
@@ -37,7 +37,7 @@
         }
         .span {
           color: colors.$text-primary !important;
-          font-family: "Fredoka", sans-serif !important;
+          font-family: 'Fredoka', sans-serif !important;
         }
         .exit-button {
           align-self: flex-end;
@@ -57,7 +57,7 @@
         width: 100%;
         padding: 20px 20px;
         gap: 4px;
-        .welcome{
+        .welcome {
           animation: fadeOut 3s forwards; /* Aplica a animação */
         }
 
@@ -65,10 +65,18 @@
           color: colors.$primary;
         }
       }
+
       @keyframes fadeOut {
-        0% { opacity: 1; }
-        80% {opacity: 0.9;}
-        100% { opacity: 0; display: none; } /* Opacidade final e ocultar */
+        0% {
+          opacity: 1;
+        }
+        80% {
+          opacity: 0.9;
+        }
+        100% {
+          opacity: 0;
+          display: none;
+        } /* Opacidade final e ocultar */
       }
 
       .search {
@@ -78,7 +86,7 @@
         width: 90%;
         justify-content: center;
 
-        .searchIcon{
+        .searchIcon {
           cursor: pointer;
         }
         mat-form-field {
@@ -98,6 +106,7 @@
         overflow-y: auto;
         overflow-x: hidden;
         width: 90%;
+
         .friends-card {
           display: flex;
           flex-direction: row;
@@ -109,7 +118,7 @@
           background-color: colors.$cardBackground;
           border-radius: 4px;
           padding: 6px 20px;
-
+          
           .message {
             display: flex;
             justify-content: flex-end;
@@ -126,21 +135,18 @@
             .userName {
               text-wrap: pretty-block;
               color: colors.$text-primary;
-              font-family: "Fredoka", sans-serif;
+              font-family: 'Fredoka', sans-serif;
               word-wrap: break-word;
             }
-            mat-icon{
+            mat-icon {
               padding: 0px !important;
               margin: 0px !important;
               transform: scale(0.8);
             }
           }
-
-
         }
-        .friends-card:hover{
+        .friends-card:hover {
           background-color: colors.$background;
-
         }
       }
     }
@@ -182,7 +188,7 @@
 //       background-color: rgba(71, 71, 71, 0.199);
 //       border-radius: 4px;
 //       padding: 6px 20px;
-      
+
 //       .status {
 //         background-color: rgba(66, 143, 143, 0.144);
 //         display: flex;
@@ -195,7 +201,6 @@
 //     }
 //   }
 // }
-
 
 /* Add media query for mobile */
 @media screen and (max-width: 1100px) {
@@ -260,7 +265,7 @@
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 16px 20px;
             overflow: hidden;
             width: 80%;
           }
@@ -279,7 +284,7 @@
   align-items: center;
   justify-content: center;
   font-size: 10px !important;
-  font-family: "Noto Sans KR", sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 ::ng-deep .menuOpen {
@@ -298,8 +303,6 @@
   }
 }
 
-
-
-.modal-dialog{
+.modal-dialog {
   background-color: colors.$background !important;
 }
